@@ -30,6 +30,7 @@ import {
 } from "@/data/cafes";
 import { distanceKm, formatHours, formatKm, formatRp, statusAt, useNow } from "@/lib/cafe-time";
 import { cn } from "@/lib/cn";
+import { useCrowd, useFreshReport, type CrowdLevel } from "@/lib/crowd";
 
 const facilityIcons: Record<FacilityId, LucideIcon> = {
   wifi: Wifi,
@@ -45,11 +46,14 @@ const facilityIcons: Record<FacilityId, LucideIcon> = {
   larut: Moon,
 };
 
-const crowdCopy = {
+const crowdCopy: Record<CrowdLevel, string> = {
   sepi: "Sepi — meja masih longgar.",
   sedang: "Sedang — ada orang, masih ada kursi.",
   ramai: "Ramai — datang lebih awal kalau butuh meja.",
-} as const;
+  penuh: "Penuh — hampir tidak ada meja kosong.",
+};
+
+const crowdLevels: CrowdLevel[] = ["sepi", "sedang", "ramai", "penuh"];
 
 export const Route = createFileRoute("/kafe/$slug")({
   loader: ({ params }) => {
@@ -92,6 +96,8 @@ function CafeDetail() {
     .filter((item) => item.slug !== cafe.slug && item.moods.some((mood) => cafe.moods.includes(mood)))
     .slice(0, 3);
   const mapHref = `https://www.openstreetmap.org/?mlat=${cafe.lat}&mlon=${cafe.lng}#map=17/${cafe.lat}/${cafe.lng}`;
+  const fresh = useFreshReport(cafe.slug);
+  const report = useCrowd((s) => s.report);
 
   return (
     <article>
@@ -158,9 +164,36 @@ function CafeDetail() {
                 {state ? ` · ${state.clock}` : ""}
               </span>
             </p>
-            {state?.open ? <p className="mt-3 text-sm">{crowdCopy[state.crowd]}</p> : null}
+
+            <div className="mt-5">
+              <p className="text-sm font-medium">Keramaian saat ini</p>
+              {fresh ? (
+                <>
+                  <p className="mt-2 text-sm">{crowdCopy[fresh.level]}</p>
+                  <p className="mt-1 text-xs text-muted">
+                    Dilaporkan {Math.round((Date.now() - fresh.at) / 60000)} menit lalu
+                  </p>
+                </>
+              ) : (
+                <p className="mt-2 text-sm text-muted">Belum ada laporan terbaru.</p>
+              )}
+              <div className="mt-3 flex flex-wrap gap-2">
+                {crowdLevels.map((level) => (
+                  <button
+                    key={level}
+                    type="button"
+                    onClick={() => report(cafe.slug, level)}
+                    className="rounded-full border border-line px-3 py-1.5 text-xs capitalize hover:bg-ink hover:text-paper"
+                  >
+                    {level}
+                  </button>
+                ))}
+              </div>
+              <p className="mt-2 text-xs text-muted">Laporan tersimpan di perangkat ini dan basi setelah 90 menit.</p>
+            </div>
+
             <CrowdBars cafe={cafe} hour={state?.hour} />
-            <p className="mt-3 text-xs text-muted">Perkiraan keramaian adalah pola contoh, bukan hitungan pengunjung.</p>
+            <p className="mt-3 text-xs text-muted">Pola di bawah adalah contoh, bukan data real-time.</p>
           </section>
 
           <section>
