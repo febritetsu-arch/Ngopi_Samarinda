@@ -1,0 +1,228 @@
+@import "tailwindcss";
+
+@theme {
+  --color-paper: #f6f0e6;
+  --color-paper-2: #efe6d8;
+  --color-ink: #2a1c14;
+  --color-ink-soft: #4a3428;
+  --color-muted: #5c4f46;
+  --color-line: #e0d3c3;
+  --color-terracotta: #9b4e32;
+  --color-olive: #4f5840;
+  --color-olive-soft: #e3e6d4;
+
+  --font-sans: "Outfit", "Avenir Next", "Segoe UI", sans-serif;
+  --font-display: "Fraunces", "Iowan Old Style", Palatino, "Palatino Linotype", serif;
+
+  --text-display: clamp(2.6rem, 1.5rem + 3.4vw, 4.8rem);
+  --text-display--line-height: 1.02;
+  --text-display--letter-spacing: -0.03em;
+  --text-title: clamp(1.75rem, 1.3rem + 1.2vw, 2.6rem);
+  --text-title--line-height: 1.12;
+  --text-title--letter-spacing: -0.03em;
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.75rem;
+
+  --shadow-lift: 0 16px 40px rgb(42 28 20 / 0.08);
+}
+
+:root {
+  --motion-quick: 150ms;
+  --motion-fast: 250ms;
+  --motion-slow: 400ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  color-scheme: light;
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    line-height: 1.5;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-terracotta);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background: var(--color-olive-soft);
+    color: var(--color-ink);
+  }
+}
+
+@layer components {
+  .kicker {
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    line-height: 1.4;
+    text-transform: uppercase;
+    color: var(--color-olive);
+  }
+
+  .brand-city {
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .press {
+    transition: transform var(--motion-quick) var(--ease-out);
+  }
+
+  .press:active {
+    transform: scale(0.98);
+  }
+
+  .photo-zoom {
+    transition: transform var(--motion-slow) var(--ease-out);
+  }
+
+  .group:hover .photo-zoom {
+    transform: scale(1.035);
+  }
+
+  .scroll-row {
+    display: flex;
+    gap: 0.5rem;
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+    scrollbar-width: none;
+  }
+
+  .scroll-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .home-hero {
+    display: grid;
+    min-height: 78vh;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(78vh, 1fr);
+  }
+
+  .tabbar {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .scrim {
+    background: linear-gradient(
+      to top,
+      rgb(42 28 20 / 0.88) 0%,
+      rgb(42 28 20 / 0.45) 42%,
+      rgb(42 28 20 / 0) 100%
+    );
+  }
+}
+
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  background: var(--color-paper-2);
+  font-family: var(--font-sans);
+  z-index: 0;
+}
+
+.leaflet-container img {
+  max-width: none !important;
+  max-height: none !important;
+}
+
+.leaflet-div-icon.cafe-pin {
+  background: transparent;
+  border: 0;
+}
+
+.pin {
+  display: block;
+  width: 1rem;
+  height: 1rem;
+  margin: 0.35rem;
+  border-radius: 999px;
+  background: var(--color-ink);
+  box-shadow: 0 0 0 2px var(--color-paper);
+}
+
+.pin-on {
+  background: var(--color-terracotta);
+  box-shadow:
+    0 0 0 2px var(--color-paper),
+    0 0 0 5px var(--color-terracotta);
+}
+
+.cafe-popup .leaflet-popup-content-wrapper {
+  border-radius: var(--radius-md);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-lift);
+}
+
+.cafe-popup .leaflet-popup-content {
+  margin: 0.85rem 1rem;
+}
+
+.cafe-popup .leaflet-popup-tip {
+  background: var(--color-paper);
+}
+
+.cafe-popup a {
+  color: var(--color-ink);
+}
+
+@media (min-width: 64rem) {
+  .home-hero {
+    min-height: calc(100dvh - 4rem);
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 63.99rem) {
+  .map-stage .leaflet-bottom {
+    bottom: 6.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photo-zoom,
+  .press {
+    transition: none;
+  }
+
+  .group:hover .photo-zoom {
+    transform: none;
+  }
+}

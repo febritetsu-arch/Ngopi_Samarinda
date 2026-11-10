@@ -1,0 +1,38 @@
+{
+  "url": "http://127.0.0.1:8081/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "NgopiSamarinda — kafe menurut suasana",
+      "hasCanvas": false,
+      "bodyTextLen": 2268,
+      "bodyTextHash": "8d0ef7c3679bbc785293811ff6fb57d34b3ed39fed5b4c8ef9a7979d3db159d1",
+      "bodyTextPrefix": "Loncat ke isi Ngopi SAMARINDA Jelajah Peta Roulette Simpan EDISI",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-built.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "NgopiSamarinda — kafe menurut suasana",
+      "hasCanvas": false,
+      "bodyTextLen": 2024,
+      "bodyTextHash": "4c1e18ab7599255ca9f34a08f93a14004a318ddcb52e428639243692a924d82a",
+      "bodyTextPrefix": "Loncat ke isi Ngopi SAMARINDA EDISI KOTA · DATA CONTOH Pilih sua",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-built-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-built.json",
+  "divergesFromBaseline": false,
+  "baselineReasons": []
+}
