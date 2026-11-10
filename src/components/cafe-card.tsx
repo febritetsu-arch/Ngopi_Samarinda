@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { moods, prices, type Cafe } from "@/data/cafes";
 import { formatHours, statusAt, type CafeStatus } from "@/lib/cafe-time";
+import { crowdLevelLabel, formatCrowdAgo, useFreshReport } from "@/lib/crowd";
 import { SaveButton } from "@/components/save-button";
 
 const crowdLabel = {
@@ -18,6 +19,8 @@ export function CafeCard({
   status: CafeStatus | null;
   priority?: boolean;
 }) {
+  const fresh = useFreshReport(cafe.slug);
+
   return (
     <article className="group">
       <div className="relative">
@@ -54,6 +57,11 @@ export function CafeCard({
           <span className="text-muted"> · {crowdLabel[status.crowd]}</span>
         ) : null}
       </p>
+      {fresh ? (
+        <p className="mt-2 inline-flex max-w-full items-center rounded-full bg-olive-soft px-2.5 py-1 text-xs font-medium text-olive">
+          {crowdLevelLabel[fresh.level]} · {formatCrowdAgo(fresh.at)}
+        </p>
+      ) : null}
     </article>
   );
 }

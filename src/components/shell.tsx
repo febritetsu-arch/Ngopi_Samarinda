@@ -1,5 +1,6 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { Bookmark, Compass, House, Map, RotateCw } from "lucide-react";
+import { Toaster } from "sonner";
 import { cn } from "@/lib/cn";
 import { useWishlist, useWishlistReady } from "@/lib/wishlist";
 
@@ -67,6 +68,18 @@ export function Shell() {
       <main id="isi" className="flex min-h-0 w-full min-w-0 flex-1 flex-col pb-16 lg:pb-0">
         <Outlet />
       </main>
+      <Toaster
+        position="bottom-center"
+        offset={88}
+        toastOptions={{
+          style: {
+            background: "var(--color-paper)",
+            color: "var(--color-ink)",
+            border: "1px solid var(--color-line)",
+            fontFamily: "var(--font-sans)",
+          },
+        }}
+      />
       <nav
         className={cn(
           "fixed inset-x-0 bottom-0 z-40 flex border-t tabbar lg:hidden",

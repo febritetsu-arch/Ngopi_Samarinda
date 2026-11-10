@@ -30,7 +30,15 @@ import {
 } from "@/data/cafes";
 import { distanceKm, formatHours, formatKm, formatRp, statusAt, useNow } from "@/lib/cafe-time";
 import { cn } from "@/lib/cn";
-import { useCrowd, useFreshReport, type CrowdLevel } from "@/lib/crowd";
+import {
+  crowdLevelLabel,
+  formatCrowdAgo,
+  useCrowd,
+  useFreshReport,
+  useOwnReport,
+  type CrowdLevel,
+} from "@/lib/crowd";
+import { toast } from "sonner";
 
 const facilityIcons: Record<FacilityId, LucideIcon> = {
   wifi: Wifi,
@@ -97,7 +105,21 @@ function CafeDetail() {
     .slice(0, 3);
   const mapHref = `https://www.openstreetmap.org/?mlat=${cafe.lat}&mlon=${cafe.lng}#map=17/${cafe.lat}/${cafe.lng}`;
   const fresh = useFreshReport(cafe.slug);
+  const own = useOwnReport(cafe.slug);
   const report = useCrowd((s) => s.report);
+  const nowMs = now?.getTime();
+
+  function submitCrowd(level: CrowdLevel, button: HTMLButtonElement) {
+    const result = report(cafe.slug, level);
+    if (result === "cooldown") {
+      toast("Kamu baru saja lapor. Coba lagi nanti.");
+      return;
+    }
+    button.classList.remove("crowd-pop");
+    void button.offsetWidth;
+    button.classList.add("crowd-pop");
+    toast("Laporan terkirim. Terima kasih!");
+  }
 
   return (
     <article>
@@ -171,25 +193,39 @@ function CafeDetail() {
                 <>
                   <p className="mt-2 text-sm">{crowdCopy[fresh.level]}</p>
                   <p className="mt-1 text-xs text-muted">
-                    Dilaporkan {Math.round((Date.now() - fresh.at) / 60000)} menit lalu
+                    Dilaporkan {formatCrowdAgo(fresh.at, nowMs)}
                   </p>
                 </>
               ) : (
                 <p className="mt-2 text-sm text-muted">Belum ada laporan terbaru.</p>
               )}
-              <div className="mt-3 flex flex-wrap gap-2">
-                {crowdLevels.map((level) => (
-                  <button
-                    key={level}
-                    type="button"
-                    onClick={() => report(cafe.slug, level)}
-                    className="rounded-full border border-line px-3 py-1.5 text-xs capitalize hover:bg-ink hover:text-paper"
-                  >
-                    {level}
-                  </button>
-                ))}
+              {own ? (
+                <p className="mt-2 text-sm font-medium">Kamu melaporkan: {crowdLevelLabel[own.level]}</p>
+              ) : null}
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                {crowdLevels.map((level) => {
+                  const selected = own?.level === level;
+                  return (
+                    <button
+                      key={level}
+                      type="button"
+                      onClick={(event) => submitCrowd(level, event.currentTarget)}
+                      aria-pressed={selected}
+                      className={cn(
+                        "press min-h-11 rounded-full border px-3 text-sm",
+                        selected
+                          ? "border-ink bg-ink text-paper"
+                          : "border-line bg-paper text-ink hover:border-ink",
+                      )}
+                    >
+                      {crowdLevelLabel[level]}
+                    </button>
+                  );
+                })}
               </div>
-              <p className="mt-2 text-xs text-muted">Laporan tersimpan di perangkat ini dan basi setelah 90 menit.</p>
+              <p className="mt-3 text-xs text-muted">
+                Satu laporan per kafe tiap 10 menit. Tersimpan di perangkat ini dan basi setelah 90 menit.
+              </p>
             </div>
 
             <CrowdBars cafe={cafe} hour={state?.hour} />

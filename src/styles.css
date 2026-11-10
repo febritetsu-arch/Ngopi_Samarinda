@@ -106,6 +106,23 @@
     transform: scale(0.98);
   }
 
+  .crowd-pop {
+    animation: crowd-pop 420ms var(--ease-out);
+    transition: none;
+  }
+
+  @keyframes crowd-pop {
+    0% {
+      transform: scale(0.96);
+    }
+    45% {
+      transform: scale(1.04);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
   .photo-zoom {
     transition: transform var(--motion-slow) var(--ease-out);
   }
