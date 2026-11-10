@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { create } from "zustand";
+import { insertCrowdReport } from "@/lib/supabase";
 
 const KEY = "ngopisamarinda-crowd";
 const MINE_KEY = "ngopisamarinda-crowd-self";
@@ -92,6 +93,7 @@ export const useCrowd = create<CrowdState>((set, get) => ({
     set({ reports, mine: nextMine, ready: true });
     writeMap(KEY, reports);
     writeMap(MINE_KEY, nextMine);
+    void insertCrowdReport(slug, level);
     return "ok";
   },
 }));
