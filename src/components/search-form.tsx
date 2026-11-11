@@ -20,7 +20,7 @@ export function SearchForm({
   return (
     <form
       role="search"
-      className="flex items-center gap-2 rounded-full border border-line bg-paper px-4"
+      className="flex items-center gap-2 rounded-full bg-paper-2 px-4 ring-1 ring-line transition-shadow duration-200 focus-within:ring-ink"
       onSubmit={(event) => {
         event.preventDefault();
         const query = q.trim();
@@ -45,7 +45,10 @@ export function SearchForm({
         className="h-12 min-w-0 flex-1 bg-transparent text-base text-ink outline-none placeholder:text-muted"
         suppressHydrationWarning
       />
-      <button type="submit" className="press my-1.5 h-11 rounded-full bg-ink px-4 text-sm font-medium text-paper">
+      <button
+        type="submit"
+        className="press my-1.5 h-11 rounded-full bg-ink px-4 text-sm font-medium text-paper transition-colors duration-150 hover:bg-terracotta"
+      >
         Cari
       </button>
     </form>

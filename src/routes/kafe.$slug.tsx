@@ -122,37 +122,64 @@ function CafeDetail() {
   }
 
   return (
-    <article>
-      <div className="relative">
-        <img
-          src={cafe.image}
-          alt={cafe.imageAlt}
-          width={1200}
-          height={1600}
-          fetchPriority="high"
-          className="aspect-[3/4] max-h-[82vh] w-full object-cover sm:aspect-[4/3] lg:aspect-[16/9]"
-        />
-        <div className="absolute top-4 right-4 left-4 flex items-center justify-between">
-          <Link
-            to="/jelajah"
-            className="inline-flex h-11 items-center rounded-full bg-paper px-4 text-sm text-ink"
-          >
-            Jelajah
-          </Link>
-          <SaveButton slug={cafe.slug} name={cafe.name} />
+    <article className="pb-24 lg:pb-0">
+      <div className="mx-auto lg:grid lg:max-w-6xl lg:grid-cols-12 lg:items-end lg:gap-8 lg:px-8 lg:pt-8">
+        <div className="relative lg:col-span-7">
+          <img
+            src={cafe.image}
+            alt={cafe.imageAlt}
+            width={1200}
+            height={1600}
+            fetchPriority="high"
+            className="aspect-[4/5] w-full object-cover sm:aspect-[5/4] lg:rounded-xl"
+          />
+          <div className="absolute top-4 right-4 left-4 flex items-center justify-between">
+            <Link
+              to="/jelajah"
+              className="press inline-flex h-11 items-center rounded-full bg-paper px-4 text-sm text-ink shadow-lift transition-colors duration-150 hover:bg-paper-2"
+            >
+              Jelajah
+            </Link>
+            <SaveButton slug={cafe.slug} name={cafe.name} />
+          </div>
         </div>
-      </div>
 
-      <div className="mx-auto grid max-w-6xl gap-12 px-5 py-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:px-8 lg:py-12">
-        <div>
+        <div className="relative z-10 -mt-10 rounded-t-3xl bg-paper px-5 pt-6 lg:col-span-5 lg:mt-0 lg:rounded-none lg:px-0 lg:pt-4">
           <p className="kicker">Data contoh · {cafe.district}</p>
           <h1 className="mt-3 text-display">{cafe.name}</h1>
           <p className="mt-4 max-w-xl text-lg text-ink-soft">{cafe.blurb}</p>
-          <p className="mt-3 text-sm text-muted">
-            {cafe.neighborhood} · {prices[cafe.price].label} · {prices[cafe.price].range} ·{" "}
-            {formatKm(km)} dari {CITY_CENTER.label}
-          </p>
-          <div className="mt-8 space-y-4">
+          <div className="mt-4 flex flex-wrap gap-2">
+            <span
+              className={cn(
+                "inline-flex h-8 items-center rounded-full px-3 text-sm font-medium",
+                state?.open ? "bg-olive text-paper" : "bg-paper-2 text-ink",
+              )}
+            >
+              {state ? (state.open ? "Buka" : "Tutup") : "Jam"}
+            </span>
+            <span className="inline-flex h-8 items-center rounded-full bg-paper-2 px-3 text-sm text-ink-soft">
+              {prices[cafe.price].label} · {prices[cafe.price].range}
+            </span>
+            <span className="inline-flex h-8 items-center rounded-full bg-paper-2 px-3 text-sm text-ink-soft">
+              {formatKm(km)} dari {CITY_CENTER.label}
+            </span>
+          </div>
+          <p className="mt-3 text-sm text-muted">{cafe.neighborhood}</p>
+        </div>
+      </div>
+
+      <div className="mx-auto mt-8 max-w-6xl px-5 lg:px-8">
+        <CrowdReport
+          fresh={fresh}
+          own={own}
+          nowMs={nowMs}
+          onSubmit={submitCrowd}
+        />
+      </div>
+
+      <div className="mx-auto mt-12 grid max-w-6xl gap-12 px-5 lg:grid-cols-[minmax(0,1fr)_20rem] lg:px-8">
+        <div>
+          <div className="space-y-4">
             {cafe.story.map((paragraph) => (
               <p key={paragraph} className="max-w-xl text-ink-soft">
                 {paragraph}
@@ -176,7 +203,7 @@ function CafeDetail() {
         </div>
 
         <aside className="space-y-8 lg:sticky lg:top-20 lg:self-start">
-          <section className="rounded-lg border border-line bg-paper-2 p-5">
+          <section className="rounded-xl bg-paper-2 p-5 ring-1 ring-line">
             <p className="kicker">Sekarang</p>
             <p className="mt-3 font-display text-3xl">{state ? (state.open ? "Buka" : "Tutup") : "—"}</p>
             <p className="mt-2 flex items-center gap-2 text-sm text-ink-soft">
@@ -186,48 +213,6 @@ function CafeDetail() {
                 {state ? ` · ${state.clock}` : ""}
               </span>
             </p>
-
-            <div className="mt-5">
-              <p className="text-sm font-medium">Keramaian saat ini</p>
-              {fresh ? (
-                <>
-                  <p className="mt-2 text-sm">{crowdCopy[fresh.level]}</p>
-                  <p className="mt-1 text-xs text-muted">
-                    Dilaporkan {formatCrowdAgo(fresh.at, nowMs)}
-                  </p>
-                </>
-              ) : (
-                <p className="mt-2 text-sm text-muted">Belum ada laporan terbaru.</p>
-              )}
-              {own ? (
-                <p className="mt-2 text-sm font-medium">Kamu melaporkan: {crowdLevelLabel[own.level]}</p>
-              ) : null}
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                {crowdLevels.map((level) => {
-                  const selected = own?.level === level;
-                  return (
-                    <button
-                      key={level}
-                      type="button"
-                      onClick={(event) => submitCrowd(level, event.currentTarget)}
-                      aria-pressed={selected}
-                      className={cn(
-                        "press min-h-11 rounded-full border px-3 text-sm",
-                        selected
-                          ? "border-ink bg-ink text-paper"
-                          : "border-line bg-paper text-ink hover:border-ink",
-                      )}
-                    >
-                      {crowdLevelLabel[level]}
-                    </button>
-                  );
-                })}
-              </div>
-              <p className="mt-3 text-xs text-muted">
-                Satu laporan per kafe tiap 10 menit. Tersimpan di perangkat ini dan basi setelah 90 menit.
-              </p>
-            </div>
-
             <CrowdBars cafe={cafe} hour={state?.hour} />
             <p className="mt-3 text-xs text-muted">Pola di bawah adalah contoh, bukan data real-time.</p>
           </section>
@@ -255,7 +240,7 @@ function CafeDetail() {
                   <Link
                     to="/jelajah"
                     search={{ mood: id }}
-                    className="inline-flex h-10 items-center rounded-full border border-line px-3 text-sm"
+                    className="press inline-flex h-11 items-center rounded-full border border-line px-3 text-sm transition-colors duration-150 hover:border-ink hover:bg-paper-2"
                   >
                     {moods[id].label}
                   </Link>
@@ -286,21 +271,25 @@ function CafeDetail() {
       </div>
 
       {related.length > 0 ? (
-        <section className="mx-auto max-w-6xl px-5 pb-4 lg:px-8">
+        <section className="mx-auto mt-16 max-w-6xl px-5 lg:px-8">
           <h2 className="text-title">Suasana yang berdekatan</h2>
-          <ul className="mt-4 border-t border-line">
+          <ul className="mt-5 grid gap-3 sm:grid-cols-3">
             {related.map((item) => (
               <li key={item.slug}>
                 <Link
                   to="/kafe/$slug"
                   params={{ slug: item.slug }}
-                  className="flex items-center justify-between gap-4 border-b border-line py-4"
+                  className="group flex items-center gap-3 rounded-xl bg-paper-2 p-3 ring-1 ring-transparent transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lift hover:ring-line"
                 >
-                  <span>
-                    <span className="block font-display text-2xl">{item.name}</span>
-                    <span className="text-sm text-muted">{item.district}</span>
+                  <img src={item.image} alt="" width={96} height={96} className="size-16 shrink-0 rounded-lg object-cover" />
+                  <span className="min-w-0">
+                    <span className="block truncate font-display text-xl transition-colors duration-150 group-hover:text-terracotta">
+                      {item.name}
+                    </span>
+                    <span className="block truncate text-sm text-muted">
+                      {item.district} · {prices[item.price].label}
+                    </span>
                   </span>
-                  <span className="text-sm text-muted">{prices[item.price].label}</span>
                 </Link>
               </li>
             ))}
@@ -308,7 +297,89 @@ function CafeDetail() {
         </section>
       ) : null}
       <FooterNote />
+      <div className="above-tab fixed inset-x-0 z-30 border-t border-line bg-paper/95 px-4 py-2 backdrop-blur-md lg:hidden">
+        <div className="flex items-center gap-3">
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-medium">
+              {state ? (state.open ? "Buka sekarang" : "Sedang tutup") : "Jam contoh"}
+              <span className="font-normal text-muted"> · {formatHours(cafe)}</span>
+            </p>
+            <p className="truncate text-xs text-muted">
+              {fresh
+                ? `${crowdLevelLabel[fresh.level]} · ${formatCrowdAgo(fresh.at, nowMs)}`
+                : "Belum ada laporan keramaian"}
+            </p>
+          </div>
+          <a
+            href="#keramaian"
+            className="press inline-flex h-11 shrink-0 items-center rounded-full bg-terracotta px-4 text-sm font-medium text-paper transition-colors duration-150 hover:bg-ink"
+          >
+            Lapor
+          </a>
+        </div>
+      </div>
     </article>
+  );
+}
+
+const crowdHint: Record<CrowdLevel, string> = {
+  sepi: "Meja masih longgar",
+  sedang: "Masih ada kursi",
+  ramai: "Datang lebih awal",
+  penuh: "Hampir tidak ada meja",
+};
+
+function CrowdReport({
+  fresh,
+  own,
+  nowMs,
+  onSubmit,
+}: {
+  fresh: { level: CrowdLevel; at: number } | null;
+  own: { level: CrowdLevel; at: number } | null;
+  nowMs: number | undefined;
+  onSubmit: (level: CrowdLevel, button: HTMLButtonElement) => void;
+}) {
+  return (
+    <section id="keramaian" className="scroll-mt-24 rounded-xl bg-olive-soft p-5 sm:p-6">
+      <p className="kicker">Dari orang yang sedang di sana</p>
+      <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
+        <h2 className="font-display text-3xl">Keramaian sekarang</h2>
+        {own ? (
+          <p className="text-sm font-medium">Kamu: {crowdLevelLabel[own.level]}</p>
+        ) : null}
+      </div>
+      {fresh ? (
+        <p className="mt-2 max-w-lg text-ink-soft">
+          {crowdCopy[fresh.level]} Dilaporkan {formatCrowdAgo(fresh.at, nowMs)}.
+        </p>
+      ) : (
+        <p className="mt-2 max-w-lg text-ink-soft">Belum ada laporan terbaru. Kalau kamu sedang di sana, bantu yang lain.</p>
+      )}
+      <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        {crowdLevels.map((level) => {
+          const selected = own?.level === level;
+          return (
+            <button
+              key={level}
+              type="button"
+              onClick={(event) => onSubmit(level, event.currentTarget)}
+              aria-pressed={selected}
+              className={cn(
+                "press flex min-h-16 flex-col items-start justify-center rounded-lg px-3 text-left transition-colors duration-150",
+                selected ? "bg-ink text-paper" : "bg-paper text-ink hover:bg-paper-2",
+              )}
+            >
+              <span className="font-medium">{crowdLevelLabel[level]}</span>
+              <span className={cn("text-xs", selected ? "text-paper/70" : "text-muted")}>{crowdHint[level]}</span>
+            </button>
+          );
+        })}
+      </div>
+      <p className="mt-3 text-xs text-muted">
+        Satu laporan per kafe tiap 10 menit. Tersimpan di perangkat ini dan basi setelah 90 menit.
+      </p>
+    </section>
   );
 }
 

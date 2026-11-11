@@ -34,7 +34,7 @@ export function Shell() {
       <header
         className={cn(
           "sticky top-0 z-30 flex h-16 items-center justify-between gap-4 border-b px-5 lg:px-8",
-          night ? "border-ink-soft bg-ink" : "border-line bg-paper/95",
+          night ? "border-ink-soft bg-ink/95 backdrop-blur-md" : "border-line bg-paper/90 backdrop-blur-md",
         )}
       >
         <Link to="/" className="flex min-h-11 items-baseline gap-2">
@@ -52,8 +52,14 @@ export function Shell() {
                   to={tab.to}
                   aria-current={on ? "page" : undefined}
                   className={cn(
-                    "inline-flex min-h-11 items-center gap-2 px-3 text-sm",
-                    on ? "font-medium" : night ? "text-paper/70" : "text-muted",
+                    "inline-flex min-h-11 items-center gap-2 rounded-full px-3 text-sm transition-colors duration-150",
+                    on
+                      ? night
+                        ? "bg-paper/10 font-medium"
+                        : "bg-paper-2 font-medium"
+                      : night
+                        ? "text-paper/70 hover:text-paper"
+                        : "text-muted hover:text-ink",
                   )}
                 >
                   {tab.label}
@@ -66,7 +72,9 @@ export function Shell() {
         </nav>
       </header>
       <main id="isi" className="flex min-h-0 w-full min-w-0 flex-1 flex-col pb-16 lg:pb-0">
-        <Outlet />
+        <div key={path} className="page-enter flex min-h-0 w-full min-w-0 flex-1 flex-col">
+          <Outlet />
+        </div>
       </main>
       <Toaster
         position="bottom-center"
@@ -96,13 +104,17 @@ export function Shell() {
               to={tab.to}
               aria-current={on ? "page" : undefined}
               className={cn(
-                "flex min-h-16 flex-1 flex-col items-center justify-center gap-1 text-xs tracking-wide",
+                "flex min-h-16 flex-1 flex-col items-center justify-center gap-0.5 text-xs tracking-wide transition-colors duration-150",
                 on ? "text-ink" : "text-muted",
                 night && (on ? "text-paper" : "text-paper/70"),
               )}
             >
               <Icon className="size-5" strokeWidth={on ? 2.2 : 1.7} />
               {tab.label}
+              <span
+                className={cn("h-0.5 w-4 rounded-full", on ? "bg-terracotta" : "bg-transparent")}
+                aria-hidden="true"
+              />
             </Link>
           );
         })}

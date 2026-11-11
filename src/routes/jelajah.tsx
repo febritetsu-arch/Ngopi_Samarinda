@@ -1,10 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { CafeCard } from "@/components/cafe-card";
 import { Filters } from "@/components/filters";
 import { FooterNote } from "@/components/footer-note";
 import { SearchForm } from "@/components/search-form";
+import { moodOrder, moods } from "@/data/cafes";
 import { statusAt, useNow } from "@/lib/cafe-time";
-import { filterCafes, readDiscover, type DiscoverSearch } from "@/lib/discover";
+import { filterCafes, readDiscover, searchActive, type DiscoverSearch } from "@/lib/discover";
 
 export const Route = createFileRoute("/jelajah")({
   validateSearch: (search): DiscoverSearch => readDiscover(search),
@@ -16,8 +17,10 @@ export const Route = createFileRoute("/jelajah")({
 
 function Jelajah() {
   const search = Route.useSearch();
+  const navigate = useNavigate();
   const now = useNow();
   const list = filterCafes(search, now);
+  const filtering = searchActive(search);
 
   return (
     <div>
@@ -25,7 +28,9 @@ function Jelajah() {
         <p className="kicker">Jelajah</p>
         <div className="mt-2 flex items-end justify-between gap-4">
           <h1 className="text-title">Kafe contoh di Samarinda</h1>
-          <p className="mb-1 shrink-0 text-sm tabular-nums text-muted">{list.length} kafe</p>
+          <p className="mb-1 shrink-0 rounded-full bg-paper-2 px-3 py-1 text-sm tabular-nums text-ink-soft">
+            {list.length} kafe
+          </p>
         </div>
         <p className="mt-3 max-w-xl text-ink-soft">
           Saring menurut suasana, kecamatan, harga, fasilitas, dan jam buka. Semua angka di halaman ini adalah data contoh.
@@ -35,14 +40,39 @@ function Jelajah() {
         </div>
         <Filters search={search} />
         {list.length === 0 ? (
-          <div className="mt-16 max-w-md border-t border-line pt-8">
-            <h2 className="font-display text-3xl">Tidak ada yang cocok</h2>
-            <p className="mt-3 text-muted">
-              Longgarkan satu saringan, atau kembali ke semua suasana. Katalog contoh ini memang sengaja kecil.
+          <div className="mt-10 rounded-xl bg-olive-soft px-5 py-8 sm:px-8">
+            <p className="kicker">Tidak ketemu</p>
+            <h2 className="mt-2 max-w-md font-display text-3xl">Tidak ada meja untuk saringan ini.</h2>
+            <p className="mt-3 max-w-md text-ink-soft">
+              Katalog contoh ini sengaja kecil. Longgarkan satu saringan, atau lompat ke suasana lain.
             </p>
+            <div className="mt-6 flex flex-wrap gap-2">
+              {filtering ? (
+                <button
+                  type="button"
+                  onClick={() => navigate({ to: "/jelajah", search: {} })}
+                  className="press h-11 rounded-full bg-ink px-4 text-sm font-medium text-paper"
+                >
+                  Lihat semua kafe
+                </button>
+              ) : null}
+              {moodOrder.map((id) => (
+                <Link
+                  key={id}
+                  to="/jelajah"
+                  search={{ mood: id }}
+                  className="press inline-flex h-11 items-center rounded-full bg-paper px-4 text-sm text-ink ring-1 ring-line transition-colors duration-150 hover:ring-ink"
+                >
+                  {moods[id].label}
+                </Link>
+              ))}
+            </div>
           </div>
         ) : (
-          <div className="mt-10 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+          <div
+            key={`${search.mood ?? ""}-${search.district ?? ""}-${search.price ?? ""}-${search.q ?? ""}-${search.sort ?? ""}-${search.open ?? ""}-${search.facility ?? ""}`}
+            className="rise-in mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
+          >
             {list.map((cafe, index) => (
               <CafeCard
                 key={cafe.slug}
