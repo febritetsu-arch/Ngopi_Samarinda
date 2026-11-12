@@ -38,6 +38,7 @@ import {
   useOwnReport,
   type CrowdLevel,
 } from "@/lib/crowd";
+import { insertCrowdReport } from "@/lib/supabase";
 import { toast } from "sonner";
 
 const facilityIcons: Record<FacilityId, LucideIcon> = {
@@ -109,7 +110,7 @@ function CafeDetail() {
   const report = useCrowd((s) => s.report);
   const nowMs = now?.getTime();
 
-  function submitCrowd(level: CrowdLevel, button: HTMLButtonElement) {
+  async function submitCrowd(level: CrowdLevel, button: HTMLButtonElement) {
     const result = report(cafe.slug, level);
     if (result === "cooldown") {
       toast("Kamu baru saja lapor. Coba lagi nanti.");
@@ -119,6 +120,11 @@ function CafeDetail() {
     void button.offsetWidth;
     button.classList.add("crowd-pop");
     toast("Laporan terkirim. Terima kasih!");
+
+    // Kirim juga ke Supabase (fire-and-forget)
+    insertCrowdReport(cafe.slug, level).catch(() => {
+      // Diam-diam gagal, localStorage tetap jadi sumber utama
+    });
   }
 
   return (
