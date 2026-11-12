@@ -14,6 +14,7 @@ import { Route as JelajahRouteImport } from './routes/jelajah'
 import { Route as PetaRouteImport } from './routes/peta'
 import { Route as RouletteRouteImport } from './routes/roulette'
 import { Route as SimpanRouteImport } from './routes/simpan'
+import { Route as UsulkanRouteImport } from './routes/usulkan'
 import { Route as KafeSlugRouteImport } from './routes/kafe.$slug'
 
 const IndexRoute = IndexRouteImport.update({
@@ -41,6 +42,11 @@ const SimpanRoute = SimpanRouteImport.update({
   path: '/simpan',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UsulkanRoute = UsulkanRouteImport.update({
+  id: '/usulkan',
+  path: '/usulkan',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const KafeSlugRoute = KafeSlugRouteImport.update({
   id: '/kafe/$slug',
   path: '/kafe/$slug',
@@ -53,6 +59,7 @@ export interface FileRoutesByFullPath {
   '/peta': typeof PetaRoute
   '/roulette': typeof RouletteRoute
   '/simpan': typeof SimpanRoute
+  '/usulkan': typeof UsulkanRoute
   '/kafe/$slug': typeof KafeSlugRoute
 }
 export interface FileRoutesByTo {
@@ -61,6 +68,7 @@ export interface FileRoutesByTo {
   '/peta': typeof PetaRoute
   '/roulette': typeof RouletteRoute
   '/simpan': typeof SimpanRoute
+  '/usulkan': typeof UsulkanRoute
   '/kafe/$slug': typeof KafeSlugRoute
 }
 export interface FileRoutesById {
@@ -70,14 +78,28 @@ export interface FileRoutesById {
   '/peta': typeof PetaRoute
   '/roulette': typeof RouletteRoute
   '/simpan': typeof SimpanRoute
+  '/usulkan': typeof UsulkanRoute
   '/kafe/$slug': typeof KafeSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/jelajah' | '/peta' | '/roulette' | '/simpan' | '/kafe/$slug'
+    | '/'
+    | '/jelajah'
+    | '/peta'
+    | '/roulette'
+    | '/simpan'
+    | '/usulkan'
+    | '/kafe/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/jelajah' | '/peta' | '/roulette' | '/simpan' | '/kafe/$slug'
+  to:
+    | '/'
+    | '/jelajah'
+    | '/peta'
+    | '/roulette'
+    | '/simpan'
+    | '/usulkan'
+    | '/kafe/$slug'
   id:
     | '__root__'
     | '/'
@@ -85,6 +107,7 @@ export interface FileRouteTypes {
     | '/peta'
     | '/roulette'
     | '/simpan'
+    | '/usulkan'
     | '/kafe/$slug'
   fileRoutesById: FileRoutesById
 }
@@ -94,6 +117,7 @@ export interface RootRouteChildren {
   PetaRoute: typeof PetaRoute
   RouletteRoute: typeof RouletteRoute
   SimpanRoute: typeof SimpanRoute
+  UsulkanRoute: typeof UsulkanRoute
   KafeSlugRoute: typeof KafeSlugRoute
 }
 
@@ -134,6 +158,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SimpanRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/usulkan': {
+      id: '/usulkan'
+      path: '/usulkan'
+      fullPath: '/usulkan'
+      preLoaderRoute: typeof UsulkanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/kafe/$slug': {
       id: '/kafe/$slug'
       path: '/kafe/$slug'
@@ -150,6 +181,7 @@ const rootRouteChildren: RootRouteChildren = {
   PetaRoute: PetaRoute,
   RouletteRoute: RouletteRoute,
   SimpanRoute: SimpanRoute,
+  UsulkanRoute: UsulkanRoute,
   KafeSlugRoute: KafeSlugRoute,
 }
 export const routeTree = rootRouteImport

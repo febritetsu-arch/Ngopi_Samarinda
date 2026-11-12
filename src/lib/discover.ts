@@ -68,10 +68,14 @@ export function toggleFacility(current: string | undefined, id: FacilityId) {
   return joined || undefined;
 }
 
-export function filterCafes(search: DiscoverSearch, now: Date | null) {
+export function filterCafes(
+  search: DiscoverSearch,
+  now: Date | null,
+  source: readonly Cafe[] = cafes,
+) {
   const q = search.q?.toLocaleLowerCase("id");
   const wanted = facilityList(search.facility);
-  let list = cafes.filter((cafe) => {
+  let list = source.filter((cafe) => {
     if (search.mood && !cafe.moods.includes(search.mood)) return false;
     if (search.district && cafe.district !== search.district) return false;
     if (search.price && cafe.price !== search.price) return false;

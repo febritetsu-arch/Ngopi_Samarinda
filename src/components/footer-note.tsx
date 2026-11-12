@@ -1,3 +1,5 @@
+import { Link } from "@tanstack/react-router";
+
 export function FooterNote() {
   return (
     <footer className="mt-20 border-t border-line px-5 py-12 lg:px-8">
@@ -9,7 +11,12 @@ export function FooterNote() {
             bukan direktori resmi kota.
           </p>
         </div>
-        <p className="text-sm text-muted">Sepuluh kecamatan. Sepuluh meja contoh.</p>
+        <div className="flex flex-col items-start gap-2">
+          <Link to="/usulkan" className="text-sm text-ink underline decoration-line underline-offset-4">
+            Usulkan kafe
+          </Link>
+          <p className="text-sm text-muted">Sepuluh kecamatan. Sepuluh meja contoh.</p>
+        </div>
       </div>
     </footer>
   );

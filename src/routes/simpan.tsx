@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CafeCard } from "@/components/cafe-card";
 import { FooterNote } from "@/components/footer-note";
-import { cafes, heroImage } from "@/data/cafes";
+import { cafes as staticCafes, heroImage } from "@/data/cafes";
 import { statusAt, useNow } from "@/lib/cafe-time";
+import { useCafes } from "@/lib/use-cafes";
 import { useWishlist } from "@/lib/wishlist";
 
 export const Route = createFileRoute("/simpan")({
@@ -17,8 +18,10 @@ function Simpan() {
   const ready = useWishlist((state) => state.ready);
   const clear = useWishlist((state) => state.clear);
   const now = useNow();
+  const { cafes, status } = useCafes();
+  const source = status === "ready" ? cafes : staticCafes;
   const saved = [...ids].reverse().flatMap((id) => {
-    const cafe = cafes.find((item) => item.slug === id);
+    const cafe = source.find((item) => item.slug === id);
     return cafe ? [cafe] : [];
   });
 

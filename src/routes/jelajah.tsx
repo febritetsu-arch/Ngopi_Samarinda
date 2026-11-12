@@ -3,9 +3,10 @@ import { CafeCard } from "@/components/cafe-card";
 import { Filters } from "@/components/filters";
 import { FooterNote } from "@/components/footer-note";
 import { SearchForm } from "@/components/search-form";
-import { moodOrder, moods } from "@/data/cafes";
+import { CafeCardSkeleton } from "@/components/skeletons";
 import { statusAt, useNow } from "@/lib/cafe-time";
 import { filterCafes, readDiscover, searchActive, type DiscoverSearch } from "@/lib/discover";
+import { useCafes } from "@/lib/use-cafes";
 
 export const Route = createFileRoute("/jelajah")({
   validateSearch: (search): DiscoverSearch => readDiscover(search),
@@ -19,7 +20,9 @@ function Jelajah() {
   const search = Route.useSearch();
   const navigate = useNavigate();
   const now = useNow();
-  const list = filterCafes(search, now);
+  const { cafes, status } = useCafes();
+  const loading = status === "loading";
+  const list = filterCafes(search, now, cafes);
   const filtering = searchActive(search);
 
   return (
@@ -29,7 +32,7 @@ function Jelajah() {
         <div className="mt-2 flex items-end justify-between gap-4">
           <h1 className="text-title">Kafe contoh di Samarinda</h1>
           <p className="mb-1 shrink-0 rounded-full bg-paper-2 px-3 py-1 text-sm tabular-nums text-ink-soft">
-            {list.length} kafe
+            {loading ? "Memuat…" : `${list.length} kafe`}
           </p>
         </div>
         <p className="mt-3 max-w-xl text-ink-soft">
@@ -39,12 +42,23 @@ function Jelajah() {
           <SearchForm initial={search.q ?? ""} keep={search} />
         </div>
         <Filters search={search} />
-        {list.length === 0 ? (
+        {loading ? (
+          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" aria-busy="true" aria-live="polite">
+            <p className="sr-only">Memuat kafe…</p>
+            {Array.from({ length: 6 }, (_, index) => (
+              <CafeCardSkeleton key={index} />
+            ))}
+          </div>
+        ) : list.length === 0 ? (
           <div className="mt-10 rounded-xl bg-olive-soft px-5 py-8 sm:px-8">
-            <p className="kicker">Tidak ketemu</p>
-            <h2 className="mt-2 max-w-md font-display text-3xl">Tidak ada meja untuk saringan ini.</h2>
+            <p className="kicker">{filtering ? "Saringan kosong" : "Katalog kosong"}</p>
+            <h2 className="mt-2 max-w-md font-display text-3xl">
+              {filtering ? "Tidak ada kafe yang cocok dengan saringan ini." : "Belum ada kafe di katalog."}
+            </h2>
             <p className="mt-3 max-w-md text-ink-soft">
-              Katalog contoh ini sengaja kecil. Longgarkan satu saringan, atau lompat ke suasana lain.
+              {filtering
+                ? "Hapus saringan untuk melihat seluruh katalog, atau longgarkan satu syarat."
+                : "Katalog belum terisi. Kamu bisa mengusulkan kafe yang belum tercatat."}
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
               {filtering ? (
@@ -53,19 +67,16 @@ function Jelajah() {
                   onClick={() => navigate({ to: "/jelajah", search: {} })}
                   className="press h-11 rounded-full bg-ink px-4 text-sm font-medium text-paper"
                 >
-                  Lihat semua kafe
+                  Hapus saringan
                 </button>
-              ) : null}
-              {moodOrder.map((id) => (
+              ) : (
                 <Link
-                  key={id}
-                  to="/jelajah"
-                  search={{ mood: id }}
-                  className="press inline-flex h-11 items-center rounded-full bg-paper px-4 text-sm text-ink ring-1 ring-line transition-colors duration-150 hover:ring-ink"
+                  to="/usulkan"
+                  className="press inline-flex h-11 items-center rounded-full bg-ink px-4 text-sm font-medium text-paper"
                 >
-                  {moods[id].label}
+                  Usulkan kafe
                 </Link>
-              ))}
+              )}
             </div>
           </div>
         ) : (

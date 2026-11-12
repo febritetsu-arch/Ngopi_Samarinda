@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { cafes, moodOrder, moods, prices, type Cafe, type MoodId } from "@/data/cafes";
+import { cafes as staticCafes, moodOrder, moods, prices, type Cafe, type MoodId } from "@/data/cafes";
 import { SaveButton } from "@/components/save-button";
 import { cn } from "@/lib/cn";
+import { useCafes } from "@/lib/use-cafes";
 
 export const Route = createFileRoute("/roulette")({
   head: () => ({
@@ -18,7 +19,9 @@ function Roulette() {
   const [spinning, setSpinning] = useState(false);
   const timer = useRef<number | null>(null);
 
-  const pool = cafes.filter((cafe) => mood === "semua" || cafe.moods.includes(mood));
+  const { cafes, status } = useCafes();
+  const source = status === "ready" ? cafes : staticCafes;
+  const pool = source.filter((cafe) => mood === "semua" || cafe.moods.includes(mood));
 
   useEffect(() => {
     return () => {

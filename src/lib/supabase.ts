@@ -127,6 +127,44 @@ export async function fetchCafes(): Promise<Cafe[]> {
  * Simpan laporan keramaian. Tanpa Supabase, fungsi ini tidak melakukan apa-apa
  * supaya alur lokal (localStorage) tetap jalan.
  */
+export type CafeSuggestionInput = {
+  name: string;
+  address: string;
+  district: District;
+  moods: MoodId[];
+  photoUrl?: string;
+  notes: string;
+};
+
+/** Simpan usulan pengunjung. Tanpa Supabase, tidak menulis apa pun. */
+export async function insertCafeSuggestion(
+  input: CafeSuggestionInput,
+): Promise<"inserted" | "skipped" | "failed"> {
+  if (!supabase) return "skipped";
+  const name = input.name.trim();
+  const address = input.address.trim();
+  const notes = input.notes.trim();
+  const photoUrl = input.photoUrl?.trim() ?? "";
+  if (!name || !address || !isOneOf(input.district, districts)) return "failed";
+  if (input.moods.length === 0 || input.moods.some((mood) => !isOneOf(mood, Object.keys(moods) as MoodId[]))) {
+    return "failed";
+  }
+  if (photoUrl && !/^https?:\/\//i.test(photoUrl)) return "failed";
+  try {
+    const { error } = await supabase.from("cafe_suggestions").insert({
+      name,
+      address,
+      district: input.district,
+      moods: input.moods,
+      photo_url: photoUrl || null,
+      notes,
+    });
+    return error ? "failed" : "inserted";
+  } catch {
+    return "failed";
+  }
+}
+
 export async function insertCrowdReport(
   cafeSlug: string,
   level: CrowdReportLevel,

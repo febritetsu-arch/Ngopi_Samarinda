@@ -4,6 +4,7 @@ import { MapView } from "@/components/map-view";
 import { cn } from "@/lib/cn";
 import { formatHours, statusAt, useNow } from "@/lib/cafe-time";
 import { filterCafes, type DiscoverSearch } from "@/lib/discover";
+import { useCafes } from "@/lib/use-cafes";
 
 type MapSearch = {
   kafe?: string;
@@ -31,8 +32,10 @@ function Peta() {
   const search = Route.useSearch();
   const navigate = useNavigate();
   const now = useNow();
+  const { cafes, status } = useCafes();
+  const loading = status === "loading";
   const discover: DiscoverSearch = { mood: search.mood };
-  const list = filterCafes(discover, now);
+  const list = filterCafes(discover, now, cafes);
   const selected = list.some((cafe) => cafe.slug === search.kafe) ? search.kafe : undefined;
   const active = list.find((cafe) => cafe.slug === selected);
 
@@ -72,9 +75,14 @@ function Peta() {
           </button>
         ))}
       </div>
+      {loading ? (
+        <div className="grid min-h-0 flex-1 place-items-center bg-paper-2" aria-busy="true" aria-live="polite">
+          <p className="text-sm text-muted">Memuat kafe…</p>
+        </div>
+      ) : (
       <div className="grid min-h-0 flex-1 lg:grid-cols-[22rem_1fr]">
         <aside className="hidden overflow-y-auto border-r border-line lg:block">
-          <p className="px-5 pt-5 text-sm text-muted">{list.length} titik contoh</p>
+          <p className="px-5 pt-5 text-sm text-muted">{list.length} titik</p>
           <ul>
             {list.map((cafe) => {
               const on = cafe.slug === selected;
@@ -102,11 +110,17 @@ function Peta() {
         </aside>
         <div className="flex min-h-0 flex-col">
           <div className="relative min-h-0 flex-1">
+            {list.length === 0 ? (
+              <div className="grid h-full place-items-center px-6 text-center">
+                <p className="max-w-xs text-sm text-muted">Tidak ada kafe untuk suasana ini.</p>
+              </div>
+            ) : (
             <MapView
               cafes={list}
               selected={selected}
               onSelect={(slug) => navigate({ to: "/peta", search: { ...search, kafe: slug } })}
             />
+            )}
             {active ? (
               <Link
                 to="/kafe/$slug"
@@ -153,6 +167,7 @@ function Peta() {
           </div>
         </div>
       </div>
+      )}
     </div>
   );
 }

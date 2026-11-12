@@ -7,6 +7,7 @@ import {
   Leaf,
   MapPin,
   Moon,
+  Share2,
   Music,
   PawPrint,
   Plug,
@@ -40,6 +41,7 @@ import {
 } from "@/lib/crowd";
 import { insertCrowdReport } from "@/lib/supabase";
 import { toast } from "sonner";
+import { useCafes } from "@/lib/use-cafes";
 
 const facilityIcons: Record<FacilityId, LucideIcon> = {
   wifi: Wifi,
@@ -65,11 +67,6 @@ const crowdCopy: Record<CrowdLevel, string> = {
 const crowdLevels: CrowdLevel[] = ["sepi", "sedang", "ramai", "penuh"];
 
 export const Route = createFileRoute("/kafe/$slug")({
-  loader: ({ params }) => {
-    const cafe = getCafe(params.slug);
-    if (!cafe) throw notFound();
-    return cafe;
-  },
   head: ({ params }) => {
     const cafe = getCafe(params.slug);
     return {
@@ -97,11 +94,50 @@ function MissingCafe() {
 }
 
 function CafeDetail() {
-  const cafe = Route.useLoaderData();
+  const { slug } = Route.useParams();
+  const catalog = useCafes();
+  const cafe =
+    catalog.status === "ready" ? catalog.cafes.find((item) => item.slug === slug) : getCafe(slug);
+  if (!cafe && catalog.status === "loading") return <DetailSkeleton />;
+  if (!cafe) throw notFound();
+  return <CafeBody cafe={cafe} catalog={catalog.status === "ready" ? catalog.cafes : cafes} />;
+}
+
+function DetailSkeleton() {
+  return (
+    <div className="mx-auto max-w-6xl px-5 py-10 lg:px-8" aria-busy="true" aria-live="polite">
+      <p className="text-sm text-muted">Memuat kafe…</p>
+      <div className="mt-4 aspect-[4/5] animate-pulse rounded-xl bg-paper-2 sm:aspect-[5/4]" />
+    </div>
+  );
+}
+
+async function copyCafeLink() {
+  const url = window.location.href;
+  try {
+    await navigator.clipboard.writeText(url);
+    toast("Tautan disalin.");
+    return;
+  } catch {
+    /* some browsers block the async clipboard API */
+  }
+  const field = document.createElement("textarea");
+  field.value = url;
+  field.setAttribute("readonly", "");
+  field.style.position = "fixed";
+  field.style.left = "-999px";
+  document.body.append(field);
+  field.select();
+  const copied = document.execCommand("copy");
+  field.remove();
+  toast(copied ? "Tautan disalin." : "Tidak bisa menyalin tautan.");
+}
+
+function CafeBody({ cafe, catalog }: { cafe: Cafe; catalog: Cafe[] }) {
   const now = useNow();
   const state = now ? statusAt(cafe, now) : null;
   const km = distanceKm(cafe.lat, cafe.lng, CITY_CENTER.lat, CITY_CENTER.lng);
-  const related = cafes
+  const related = catalog
     .filter((item) => item.slug !== cafe.slug && item.moods.some((mood) => cafe.moods.includes(mood)))
     .slice(0, 3);
   const mapHref = `https://www.openstreetmap.org/?mlat=${cafe.lat}&mlon=${cafe.lng}#map=17/${cafe.lat}/${cafe.lng}`;
@@ -146,7 +182,17 @@ function CafeDetail() {
             >
               Jelajah
             </Link>
-            <SaveButton slug={cafe.slug} name={cafe.name} />
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => void copyCafeLink()}
+                aria-label="Salin tautan kafe"
+                className="press inline-flex size-11 items-center justify-center rounded-full bg-paper text-ink shadow-lift transition-colors duration-150 hover:bg-paper-2"
+              >
+                <Share2 className="size-4" />
+              </button>
+              <SaveButton slug={cafe.slug} name={cafe.name} />
+            </div>
           </div>
         </div>
 

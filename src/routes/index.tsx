@@ -3,8 +3,10 @@ import { ArrowUpRight, Camera, CloudRain, Coffee, Heart, Laptop, Map, Users, typ
 import { CafeCard } from "@/components/cafe-card";
 import { FooterNote } from "@/components/footer-note";
 import { SearchForm } from "@/components/search-form";
-import { cafes, featuredSlugs, heroImage, moodOrder, moods, prices, type MoodId } from "@/data/cafes";
+import { CafeCardSkeleton, DirectoryRowSkeleton, MoodSkeleton } from "@/components/skeletons";
+import { featuredSlugs, heroImage, moodOrder, moods, prices, type MoodId } from "@/data/cafes";
 import { formatHours, statusAt, useNow } from "@/lib/cafe-time";
+import { useCafes } from "@/lib/use-cafes";
 
 const moodIcon: Record<MoodId, LucideIcon> = {
   fokus: Laptop,
@@ -24,9 +26,12 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const now = useNow();
+  const { cafes, status } = useCafes();
+  const loading = status === "loading";
   const featured = featuredSlugs
     .map((slug) => cafes.find((cafe) => cafe.slug === slug))
     .filter((cafe) => cafe !== undefined);
+  const picks = featured.length > 0 ? featured : cafes.slice(0, 4);
   const openCount = now ? cafes.filter((cafe) => statusAt(cafe, now).open).length : null;
 
   return (
@@ -61,9 +66,11 @@ function Home() {
           </div>
           <aside className="relative z-10 -mt-12 ml-4 max-w-xs rounded-xl bg-paper p-4 shadow-lift ring-1 ring-line sm:ml-8 lg:absolute lg:bottom-6 lg:-left-8 lg:mt-0">
             <p className="kicker">Di katalog ini</p>
-            <p className="mt-2 font-display text-2xl leading-tight">Sepuluh meja. Sepuluh kecamatan.</p>
+            <p className="mt-2 font-display text-2xl leading-tight">
+              {loading ? "Memuat katalog…" : `${cafes.length} meja di katalog.`}
+            </p>
             <p className="mt-2 text-sm text-muted">
-              {openCount === null ? "Jam mengikuti WITA." : `${openCount} sedang buka menurut jam contoh.`}
+              {loading || openCount === null ? "Jam mengikuti WITA." : `${openCount} sedang buka menurut jam contoh.`}
             </p>
             <Link
               to="/jelajah"
@@ -92,6 +99,14 @@ function Home() {
             <ArrowUpRight className="size-4" />
           </Link>
         </div>
+        {loading ? (
+          <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-3" aria-busy="true" aria-live="polite">
+            <p className="sr-only">Memuat kafe…</p>
+            {moodOrder.map((id) => (
+              <MoodSkeleton key={id} />
+            ))}
+          </div>
+        ) : (
         <div className="rise-grid mt-6 grid grid-cols-2 gap-3 lg:grid-cols-3">
           {moodOrder.map((id) => {
             const count = cafes.filter((cafe) => cafe.moods.includes(id)).length;
@@ -115,6 +130,7 @@ function Home() {
             );
           })}
         </div>
+        )}
       </section>
 
       <section className="mx-auto max-w-6xl px-5 lg:px-8" aria-labelledby="meja">
@@ -122,11 +138,19 @@ function Home() {
         <h2 id="meja" className="mt-2 text-title">
           Meja yang sering dicari
         </h2>
+        {loading ? (
+          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4" aria-busy="true">
+            {Array.from({ length: 4 }, (_, index) => (
+              <CafeCardSkeleton key={index} />
+            ))}
+          </div>
+        ) : (
         <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {featured.map((cafe, index) => (
+          {picks.map((cafe, index) => (
             <CafeCard key={cafe.slug} cafe={cafe} status={now ? statusAt(cafe, now) : null} priority={index < 2} />
           ))}
         </div>
+        )}
       </section>
 
       <section className="mx-auto mt-20 max-w-6xl px-5 lg:px-8" aria-labelledby="kecamatan">
@@ -145,6 +169,13 @@ function Home() {
             <ArrowUpRight className="size-4" />
           </Link>
         </div>
+        {loading ? (
+          <div className="mt-6" aria-busy="true">
+            {Array.from({ length: 6 }, (_, index) => (
+              <DirectoryRowSkeleton key={index} />
+            ))}
+          </div>
+        ) : (
         <ol className="mt-6">
           {cafes.map((cafe, index) => (
             <li key={cafe.slug}>
@@ -182,6 +213,7 @@ function Home() {
             </li>
           ))}
         </ol>
+        )}
       </section>
 
       <section className="mx-auto mt-16 grid max-w-6xl gap-4 px-5 sm:grid-cols-2 lg:px-8">
@@ -204,7 +236,9 @@ function Home() {
             Di peta
           </p>
           <span>
-            <span className="block font-display text-3xl">Sepuluh titik di kota</span>
+            <span className="block font-display text-3xl">
+              {loading ? "Memuat titik di kota" : `${cafes.length} titik di kota`}
+            </span>
             <span className="mt-2 block text-sm text-ink-soft">Dari Sempaja sampai Loa Janan Ilir.</span>
           </span>
         </Link>

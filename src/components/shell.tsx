@@ -41,6 +41,22 @@ export function Shell() {
           <span className="font-display text-2xl italic leading-none">Ngopi</span>
           <span className={cn("brand-city", night ? "text-paper/70" : "text-olive")}>Samarinda</span>
         </Link>
+        <div className="flex items-center gap-1">
+        <Link
+          to="/usulkan"
+          className={cn(
+            "inline-flex h-11 items-center rounded-full px-4 text-sm",
+            isOn(path, "/usulkan")
+              ? night
+                ? "bg-paper/10 font-medium"
+                : "bg-paper-2 font-medium"
+              : night
+                ? "text-paper/80"
+                : "text-ink",
+          )}
+        >
+          Usulkan
+        </Link>
         <nav className="hidden items-center gap-1 lg:flex" aria-label="Utama">
           {tabs
             .filter((tab) => tab.to !== "/")
@@ -70,6 +86,7 @@ export function Shell() {
               );
             })}
         </nav>
+        </div>
       </header>
       <main id="isi" className="flex min-h-0 w-full min-w-0 flex-1 flex-col pb-16 lg:pb-0">
         <div key={path} className="page-enter flex min-h-0 w-full min-w-0 flex-1 flex-col">
