@@ -17,16 +17,19 @@
   --text-display: clamp(2.6rem, 1.5rem + 3.4vw, 4.8rem);
   --text-display--line-height: 1.02;
   --text-display--letter-spacing: -0.03em;
-  --text-title: clamp(1.75rem, 1.3rem + 1.2vw, 2.6rem);
-  --text-title--line-height: 1.12;
-  --text-title--letter-spacing: -0.03em;
+  --text-title: clamp(1.85rem, 1.2rem + 1.6vw, 3.1rem);
+  --text-title--line-height: 1.02;
+  --text-title--letter-spacing: -0.035em;
+  --text-mega: clamp(3.6rem, 0.6rem + 11vw, 8.4rem);
+  --text-mega--line-height: 0.84;
+  --text-mega--letter-spacing: -0.05em;
 
   --radius-sm: 0.5rem;
   --radius-md: 0.75rem;
   --radius-lg: 1.25rem;
   --radius-xl: 1.75rem;
 
-  --shadow-lift: 0 16px 40px rgb(42 28 20 / 0.08);
+  --shadow-lift: 0 22px 50px rgb(42 28 20 / 0.14);
 }
 
 :root {
@@ -83,12 +86,12 @@
 @layer components {
   .kicker {
     font-family: var(--font-sans);
-    font-size: 0.75rem;
-    font-weight: 500;
-    letter-spacing: 0.14em;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
     line-height: 1.4;
     text-transform: uppercase;
-    color: var(--color-olive);
+    color: var(--color-terracotta);
   }
 
   .brand-city {
@@ -124,11 +127,38 @@
   }
 
   .photo-zoom {
-    transition: transform var(--motion-slow) var(--ease-out);
+    transition: transform 500ms var(--ease-out);
   }
 
-  .group:hover .photo-zoom {
-    transform: scale(1.035);
+  .group:hover .photo-zoom,
+  .group:focus-within .photo-zoom {
+    transform: scale(1.07);
+  }
+
+  .group:active .photo-zoom {
+    transform: scale(1.02);
+  }
+
+  .name-nudge {
+    transition: transform var(--motion-fast) var(--ease-out);
+  }
+
+  .group:hover .name-nudge,
+  .group:focus-within .name-nudge {
+    transform: translateX(0.4rem);
+  }
+
+  .rule-draw {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    background-size: 0 2px;
+    transition: background-size var(--motion-fast) var(--ease-out);
+  }
+
+  .group:hover .rule-draw,
+  .rule-draw:hover {
+    background-size: 100% 2px;
   }
 
   .scroll-row {
@@ -151,6 +181,10 @@
 
   .above-tab {
     bottom: calc(4rem + env(safe-area-inset-bottom));
+  }
+
+  .dock {
+    bottom: calc(4.5rem + env(safe-area-inset-bottom));
   }
 
   .page-enter {
@@ -279,6 +313,12 @@
   color: var(--color-ink);
 }
 
+@media (min-width: 64rem) {
+  .dock {
+    bottom: 1.5rem;
+  }
+}
+
 @media (max-width: 63.99rem) {
   .map-stage .leaflet-bottom {
     bottom: 6.5rem;
@@ -287,11 +327,17 @@
 
 @media (prefers-reduced-motion: reduce) {
   .photo-zoom,
-  .press {
+  .press,
+  .name-nudge,
+  .rule-draw {
     transition: none;
   }
 
-  .group:hover .photo-zoom {
+  .group:hover .photo-zoom,
+  .group:focus-within .photo-zoom,
+  .group:active .photo-zoom,
+  .group:hover .name-nudge,
+  .group:focus-within .name-nudge {
     transform: none;
   }
 

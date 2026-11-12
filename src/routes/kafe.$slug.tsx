@@ -83,10 +83,11 @@ export const Route = createFileRoute("/kafe/$slug")({
 
 function MissingCafe() {
   return (
-    <div className="mx-auto max-w-lg px-5 py-20">
+    <div className="mx-auto max-w-lg px-5 py-24">
       <p className="kicker">Tidak ada</p>
-      <h1 className="mt-3 text-title">Kafe ini tidak ada di katalog contoh.</h1>
-      <Link to="/jelajah" className="mt-6 inline-flex min-h-11 items-center text-sm underline">
+      <h1 className="mt-4 text-mega">Hilang.</h1>
+      <p className="mt-4 text-ink-soft">Kafe ini tidak ada di katalog contoh.</p>
+      <Link to="/jelajah" className="rule-draw mt-6 inline-flex min-h-11 items-center text-sm font-medium">
         Kembali ke jelajah
       </Link>
     </div>
@@ -107,7 +108,7 @@ function DetailSkeleton() {
   return (
     <div className="mx-auto max-w-6xl px-5 py-10 lg:px-8" aria-busy="true" aria-live="polite">
       <p className="text-sm text-muted">Memuat kafe…</p>
-      <div className="mt-4 aspect-[4/5] animate-pulse rounded-xl bg-paper-2 sm:aspect-[5/4]" />
+      <div className="mt-6 aspect-[4/5] animate-pulse bg-paper-2 sm:aspect-[5/4]" />
     </div>
   );
 }
@@ -164,21 +165,21 @@ function CafeBody({ cafe, catalog }: { cafe: Cafe; catalog: Cafe[] }) {
   }
 
   return (
-    <article className="pb-24 lg:pb-0">
-      <div className="mx-auto lg:grid lg:max-w-6xl lg:grid-cols-12 lg:items-end lg:gap-8 lg:px-8 lg:pt-8">
-        <div className="relative lg:col-span-7">
+    <article className="pb-28">
+      <div className="lg:mx-auto lg:grid lg:max-w-6xl lg:grid-cols-12 lg:px-8 lg:pt-8">
+        <div className="relative lg:col-span-7 lg:col-start-6 lg:row-start-1">
           <img
             src={cafe.image}
             alt={cafe.imageAlt}
             width={1200}
             height={1600}
             fetchPriority="high"
-            className="aspect-[4/5] w-full object-cover sm:aspect-[5/4] lg:rounded-xl"
+            className="aspect-[4/5] w-full object-cover sm:aspect-[5/4]"
           />
           <div className="absolute top-4 right-4 left-4 flex items-center justify-between">
             <Link
               to="/jelajah"
-              className="press inline-flex h-11 items-center rounded-full bg-paper px-4 text-sm text-ink shadow-lift transition-colors duration-150 hover:bg-paper-2"
+              className="press inline-flex h-11 items-center bg-paper px-4 text-sm text-ink shadow-lift transition-colors duration-150 hover:bg-paper-2"
             >
               Jelajah
             </Link>
@@ -187,7 +188,7 @@ function CafeBody({ cafe, catalog }: { cafe: Cafe; catalog: Cafe[] }) {
                 type="button"
                 onClick={() => void copyCafeLink()}
                 aria-label="Salin tautan kafe"
-                className="press inline-flex size-11 items-center justify-center rounded-full bg-paper text-ink shadow-lift transition-colors duration-150 hover:bg-paper-2"
+                className="press inline-flex size-11 items-center justify-center bg-paper text-ink shadow-lift transition-colors duration-150 hover:bg-paper-2"
               >
                 <Share2 className="size-4" />
               </button>
@@ -196,69 +197,82 @@ function CafeBody({ cafe, catalog }: { cafe: Cafe; catalog: Cafe[] }) {
           </div>
         </div>
 
-        <div className="relative z-10 -mt-10 rounded-t-3xl bg-paper px-5 pt-6 lg:col-span-5 lg:mt-0 lg:rounded-none lg:px-0 lg:pt-4">
-          <p className="kicker">Data contoh · {cafe.district}</p>
-          <h1 className="mt-3 text-display">{cafe.name}</h1>
-          <p className="mt-4 max-w-xl text-lg text-ink-soft">{cafe.blurb}</p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <span
-              className={cn(
-                "inline-flex h-8 items-center rounded-full px-3 text-sm font-medium",
-                state?.open ? "bg-olive text-paper" : "bg-paper-2 text-ink",
-              )}
-            >
-              {state ? (state.open ? "Buka" : "Tutup") : "Jam"}
-            </span>
-            <span className="inline-flex h-8 items-center rounded-full bg-paper-2 px-3 text-sm text-ink-soft">
-              {prices[cafe.price].label} · {prices[cafe.price].range}
-            </span>
-            <span className="inline-flex h-8 items-center rounded-full bg-paper-2 px-3 text-sm text-ink-soft">
-              {formatKm(km)} dari {CITY_CENTER.label}
-            </span>
-          </div>
-          <p className="mt-3 text-sm text-muted">{cafe.neighborhood}</p>
+        <div className="relative z-10 bg-paper px-5 pt-8 lg:col-span-6 lg:col-start-1 lg:row-start-1 lg:flex lg:flex-col lg:justify-end lg:bg-transparent lg:px-0 lg:pt-0 lg:pr-10 lg:pb-6">
+          <p className="kicker">
+            Data contoh · {cafe.district}
+          </p>
+          <h1 className="mt-3 max-w-xl text-display">{cafe.name}</h1>
+          <p className="mt-5 max-w-md text-lg leading-relaxed text-ink-soft">{cafe.blurb}</p>
+          <dl className="mt-6 max-w-sm space-y-2 text-sm">
+            <div className="flex items-baseline justify-between gap-4">
+              <dt className="text-muted">Status</dt>
+              <dd className={cn("font-medium", state?.open ? "text-olive" : "text-ink")}>
+                {state ? (state.open ? "Buka" : "Tutup") : "Jam contoh"}
+              </dd>
+            </div>
+            <div className="flex items-baseline justify-between gap-4">
+              <dt className="text-muted">Harga</dt>
+              <dd>
+                {prices[cafe.price].label} · {prices[cafe.price].range}
+              </dd>
+            </div>
+            <div className="flex items-baseline justify-between gap-4">
+              <dt className="text-muted">Jarak</dt>
+              <dd>
+                {formatKm(km)} dari {CITY_CENTER.label}
+              </dd>
+            </div>
+            <div className="flex items-baseline justify-between gap-4">
+              <dt className="text-muted">Kawasan</dt>
+              <dd>{cafe.neighborhood}</dd>
+            </div>
+          </dl>
         </div>
       </div>
 
-      <div className="mx-auto mt-8 max-w-6xl px-5 lg:px-8">
-        <CrowdReport
-          fresh={fresh}
-          own={own}
-          nowMs={nowMs}
-          onSubmit={submitCrowd}
-        />
-      </div>
+      <CrowdReport fresh={fresh} own={own} nowMs={nowMs} onSubmit={submitCrowd} />
 
-      <div className="mx-auto mt-12 grid max-w-6xl gap-12 px-5 lg:grid-cols-[minmax(0,1fr)_20rem] lg:px-8">
-        <div>
-          <div className="space-y-4">
-            {cafe.story.map((paragraph) => (
-              <p key={paragraph} className="max-w-xl text-ink-soft">
+      <div className="mx-auto mt-16 grid max-w-6xl gap-16 px-5 lg:grid-cols-12 lg:px-8">
+        <div className="lg:col-span-7">
+          <div>
+            {cafe.story.map((paragraph, index) => (
+              <p
+                key={paragraph}
+                className={cn(
+                  "max-w-xl",
+                  index === 0 ? "font-display text-2xl leading-snug text-ink sm:text-3xl" : "mt-5 text-ink-soft",
+                )}
+              >
                 {paragraph}
               </p>
             ))}
           </div>
 
-          <h2 className="mt-12 text-title">Menu contoh</h2>
-          <ul className="mt-4 max-w-xl border-t border-line">
-            {cafe.menu.map((item) => (
-              <li key={item.name} className="flex items-baseline justify-between gap-6 border-b border-line py-4">
+          <h2 className="mt-20 text-title">Menu contoh</h2>
+          <ul className="mt-8 max-w-xl space-y-7">
+            {cafe.menu.map((item, index) => (
+              <li
+                key={item.name}
+                className={cn("flex items-baseline justify-between gap-6", index % 2 === 1 && "sm:pl-10")}
+              >
                 <span>
-                  <span className="block font-medium">{item.name}</span>
-                  <span className="text-sm text-muted">{item.note}</span>
+                  <span className="block font-display text-2xl leading-none">{item.name}</span>
+                  <span className="mt-1 block text-sm text-muted">{item.note}</span>
                 </span>
-                <span className="shrink-0 tabular-nums">{formatRp(item.price)}</span>
+                <span className="shrink-0 font-display text-xl text-terracotta tabular-nums">
+                  {formatRp(item.price)}
+                </span>
               </li>
             ))}
           </ul>
-          <p className="mt-3 text-sm text-muted">Andalan rumah: {cafe.signature}.</p>
+          <p className="mt-8 max-w-sm text-sm text-muted">Andalan rumah: {cafe.signature}.</p>
         </div>
 
-        <aside className="space-y-8 lg:sticky lg:top-20 lg:self-start">
-          <section className="rounded-xl bg-paper-2 p-5 ring-1 ring-line">
+        <aside className="space-y-12 lg:col-span-4 lg:col-start-9 lg:sticky lg:top-24 lg:self-start">
+          <section className="bg-paper-2 px-5 py-6">
             <p className="kicker">Sekarang</p>
-            <p className="mt-3 font-display text-3xl">{state ? (state.open ? "Buka" : "Tutup") : "—"}</p>
-            <p className="mt-2 flex items-center gap-2 text-sm text-ink-soft">
+            <p className="mt-3 font-display text-5xl leading-none">{state ? (state.open ? "Buka" : "Tutup") : "—"}</p>
+            <p className="mt-3 flex items-center gap-2 text-sm text-ink-soft">
               <Clock className="size-4 text-olive" />
               <span className="tabular-nums">
                 {formatHours(cafe)} WITA
@@ -270,12 +284,12 @@ function CafeBody({ cafe, catalog }: { cafe: Cafe; catalog: Cafe[] }) {
           </section>
 
           <section>
-            <h2 className="font-display text-2xl">Fasilitas</h2>
-            <ul className="mt-2">
+            <h2 className="font-display text-3xl">Fasilitas</h2>
+            <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-3">
               {cafe.facilities.map((id) => {
                 const Icon = facilityIcons[id];
                 return (
-                  <li key={id} className="flex items-center gap-3 border-b border-line py-3 text-sm">
+                  <li key={id} className="inline-flex items-center gap-2 text-sm">
                     <Icon className="size-4 text-olive" />
                     {facilities[id].label}
                   </li>
@@ -285,14 +299,14 @@ function CafeBody({ cafe, catalog }: { cafe: Cafe; catalog: Cafe[] }) {
           </section>
 
           <section>
-            <h2 className="font-display text-2xl">Suasana</h2>
-            <ul className="mt-3 flex flex-wrap gap-2">
+            <h2 className="font-display text-3xl">Suasana</h2>
+            <ul className="mt-4 flex flex-wrap gap-x-4">
               {cafe.moods.map((id) => (
                 <li key={id}>
                   <Link
                     to="/jelajah"
                     search={{ mood: id }}
-                    className="press inline-flex h-11 items-center rounded-full border border-line px-3 text-sm transition-colors duration-150 hover:border-ink hover:bg-paper-2"
+                    className="rule-draw press inline-flex h-11 items-center text-sm font-medium"
                   >
                     {moods[id].label}
                   </Link>
@@ -302,19 +316,19 @@ function CafeBody({ cafe, catalog }: { cafe: Cafe; catalog: Cafe[] }) {
           </section>
 
           <section>
-            <h2 className="flex items-center gap-2 font-display text-2xl">
+            <h2 className="flex items-center gap-2 font-display text-3xl">
               <MapPin className="size-5" />
               Lokasi contoh
             </h2>
-            <p className="mt-2 text-sm text-ink-soft">{cafe.address}</p>
-            <div className="mt-3 h-52 overflow-hidden rounded-lg">
+            <p className="mt-3 text-sm text-ink-soft">{cafe.address}</p>
+            <div className="mt-4 h-56 overflow-hidden">
               <MapView cafes={[cafe]} selected={cafe.slug} onSelect={() => undefined} />
             </div>
             <a
               href={mapHref}
               target="_blank"
               rel="noreferrer"
-              className="mt-3 inline-flex min-h-11 items-center text-sm underline decoration-line underline-offset-4"
+              className="rule-draw mt-3 inline-flex min-h-11 items-center text-sm font-medium"
             >
               Buka di OpenStreetMap
             </a>
@@ -323,24 +337,33 @@ function CafeBody({ cafe, catalog }: { cafe: Cafe; catalog: Cafe[] }) {
       </div>
 
       {related.length > 0 ? (
-        <section className="mx-auto mt-16 max-w-6xl px-5 lg:px-8">
+        <section className="mx-auto mt-24 max-w-6xl px-5 lg:px-8">
           <h2 className="text-title">Suasana yang berdekatan</h2>
-          <ul className="mt-5 grid gap-3 sm:grid-cols-3">
-            {related.map((item) => (
-              <li key={item.slug}>
-                <Link
-                  to="/kafe/$slug"
-                  params={{ slug: item.slug }}
-                  className="group flex items-center gap-3 rounded-xl bg-paper-2 p-3 ring-1 ring-transparent transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lift hover:ring-line"
-                >
-                  <img src={item.image} alt="" width={96} height={96} className="size-16 shrink-0 rounded-lg object-cover" />
-                  <span className="min-w-0">
-                    <span className="block truncate font-display text-xl transition-colors duration-150 group-hover:text-terracotta">
-                      {item.name}
-                    </span>
-                    <span className="block truncate text-sm text-muted">
-                      {item.district} · {prices[item.price].label}
-                    </span>
+          <ul className="mt-8 flex gap-5 overflow-x-auto pb-2 lg:grid lg:grid-cols-12 lg:overflow-visible">
+            {related.map((item, index) => (
+              <li
+                key={item.slug}
+                className={cn(
+                  "w-64 shrink-0 lg:w-auto",
+                  index === 0 && "lg:col-span-5",
+                  index === 1 && "lg:col-span-4 lg:mt-12",
+                  index === 2 && "lg:col-span-3",
+                )}
+              >
+                <Link to="/kafe/$slug" params={{ slug: item.slug }} className="group block">
+                  <img
+                    src={item.image}
+                    alt=""
+                    width={640}
+                    height={800}
+                    className={cn(
+                      "photo-zoom w-full object-cover",
+                      index === 1 ? "aspect-square" : "aspect-[4/5]",
+                    )}
+                  />
+                  <span className="name-nudge mt-3 block font-display text-2xl leading-none">{item.name}</span>
+                  <span className="mt-1 block text-sm text-muted">
+                    {item.district} · {prices[item.price].label}
                   </span>
                 </Link>
               </li>
@@ -349,22 +372,18 @@ function CafeBody({ cafe, catalog }: { cafe: Cafe; catalog: Cafe[] }) {
         </section>
       ) : null}
       <FooterNote />
-      <div className="above-tab fixed inset-x-0 z-30 border-t border-line bg-paper/95 px-4 py-2 backdrop-blur-md lg:hidden">
-        <div className="flex items-center gap-3">
+      <div className="dock fixed z-30 inset-x-3 lg:inset-x-auto lg:left-8 lg:w-96">
+        <div className="flex items-center gap-3 bg-ink px-4 py-3 text-paper shadow-lift">
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium">
-              {state ? (state.open ? "Buka sekarang" : "Sedang tutup") : "Jam contoh"}
-              <span className="font-normal text-muted"> · {formatHours(cafe)}</span>
-            </p>
-            <p className="truncate text-xs text-muted">
-              {fresh
-                ? `${crowdLevelLabel[fresh.level]} · ${formatCrowdAgo(fresh.at, nowMs)}`
-                : "Belum ada laporan keramaian"}
+            <p className="truncate font-display text-xl leading-none">{cafe.name}</p>
+            <p className="mt-1 truncate text-xs text-paper/70">
+              {state ? (state.open ? "Buka" : "Tutup") : "Jam contoh"} · {formatHours(cafe)}
+              {fresh ? ` · ${crowdLevelLabel[fresh.level]}` : ""}
             </p>
           </div>
           <a
             href="#keramaian"
-            className="press inline-flex h-11 shrink-0 items-center rounded-full bg-terracotta px-4 text-sm font-medium text-paper transition-colors duration-150 hover:bg-ink"
+            className="press inline-flex h-11 shrink-0 items-center bg-terracotta px-4 text-sm font-medium text-paper transition-colors duration-150 hover:bg-paper hover:text-ink"
           >
             Lapor
           </a>
@@ -381,6 +400,13 @@ const crowdHint: Record<CrowdLevel, string> = {
   penuh: "Hampir tidak ada meja",
 };
 
+const crowdSize: Record<CrowdLevel, string> = {
+  sepi: "min-h-24",
+  sedang: "min-h-32 sm:min-h-36",
+  ramai: "min-h-40 sm:min-h-48",
+  penuh: "min-h-28 sm:mt-6",
+};
+
 function CrowdReport({
   fresh,
   own,
@@ -393,22 +419,32 @@ function CrowdReport({
   onSubmit: (level: CrowdLevel, button: HTMLButtonElement) => void;
 }) {
   return (
-    <section id="keramaian" className="scroll-mt-24 rounded-xl bg-olive-soft p-5 sm:p-6">
-      <p className="kicker">Dari orang yang sedang di sana</p>
-      <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
-        <h2 className="font-display text-3xl">Keramaian sekarang</h2>
-        {own ? (
-          <p className="text-sm font-medium">Kamu: {crowdLevelLabel[own.level]}</p>
-        ) : null}
+    <section id="keramaian" className="scroll-mt-24 mt-14 bg-ink px-5 py-12 text-paper sm:px-8 sm:py-16 lg:mt-20">
+      <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-12 lg:items-end">
+        <div className="lg:col-span-6">
+          <p className="kicker text-paper/70">Dari orang yang sedang di sana</p>
+          <h2 className="mt-3 font-display text-5xl leading-none sm:text-7xl">
+            Keramaian
+            <span className="mt-1 block italic text-terracotta">sekarang.</span>
+          </h2>
+          {own ? <p className="mt-4 text-sm font-medium text-paper">Kamu: {crowdLevelLabel[own.level]}</p> : null}
+        </div>
+        <div className="lg:col-span-5 lg:col-start-8">
+          {fresh ? (
+            <p className="text-lg text-paper/80">
+              {crowdCopy[fresh.level]} Dilaporkan {formatCrowdAgo(fresh.at, nowMs)}.
+            </p>
+          ) : (
+            <p className="text-lg text-paper/80">
+              Belum ada laporan terbaru. Kalau kamu sedang di sana, bantu yang lain.
+            </p>
+          )}
+          <p className="mt-3 text-xs text-paper/55">
+            Satu laporan per kafe tiap 10 menit. Tersimpan di perangkat ini dan basi setelah 90 menit.
+          </p>
+        </div>
       </div>
-      {fresh ? (
-        <p className="mt-2 max-w-lg text-ink-soft">
-          {crowdCopy[fresh.level]} Dilaporkan {formatCrowdAgo(fresh.at, nowMs)}.
-        </p>
-      ) : (
-        <p className="mt-2 max-w-lg text-ink-soft">Belum ada laporan terbaru. Kalau kamu sedang di sana, bantu yang lain.</p>
-      )}
-      <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+      <div className="mx-auto mt-10 grid max-w-6xl grid-cols-2 items-end gap-3 sm:grid-cols-4">
         {crowdLevels.map((level) => {
           const selected = own?.level === level;
           return (
@@ -418,19 +454,17 @@ function CrowdReport({
               onClick={(event) => onSubmit(level, event.currentTarget)}
               aria-pressed={selected}
               className={cn(
-                "press flex min-h-16 flex-col items-start justify-center rounded-lg px-3 text-left transition-colors duration-150",
-                selected ? "bg-ink text-paper" : "bg-paper text-ink hover:bg-paper-2",
+                "press flex flex-col items-start justify-end px-3 py-3 text-left transition-colors duration-150",
+                crowdSize[level],
+                selected ? "bg-terracotta text-paper" : "bg-paper text-ink hover:bg-olive-soft",
               )}
             >
-              <span className="font-medium">{crowdLevelLabel[level]}</span>
-              <span className={cn("text-xs", selected ? "text-paper/70" : "text-muted")}>{crowdHint[level]}</span>
+              <span className="font-display text-2xl leading-none sm:text-3xl">{crowdLevelLabel[level]}</span>
+              <span className={cn("mt-2 text-xs", selected ? "text-paper/80" : "text-muted")}>{crowdHint[level]}</span>
             </button>
           );
         })}
       </div>
-      <p className="mt-3 text-xs text-muted">
-        Satu laporan per kafe tiap 10 menit. Tersimpan di perangkat ini dan basi setelah 90 menit.
-      </p>
     </section>
   );
 }
@@ -438,7 +472,7 @@ function CrowdReport({
 function CrowdBars({ cafe, hour }: { cafe: Cafe; hour?: number }) {
   const heights = ["h-2", "h-4", "h-7", "h-10"] as const;
   return (
-    <div className="mt-5 flex h-12 items-end gap-1" aria-hidden="true">
+    <div className="mt-6 flex h-16 items-end gap-1" aria-hidden="true">
       {cafe.crowd.map((level, index) => (
         <span
           key={index}

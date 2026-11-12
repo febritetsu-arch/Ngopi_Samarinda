@@ -33,11 +33,12 @@ export function Shell() {
       </a>
       <header
         className={cn(
-          "sticky top-0 z-30 flex h-16 items-center justify-between gap-4 border-b px-5 lg:px-8",
-          night ? "border-ink-soft bg-ink/95 backdrop-blur-md" : "border-line bg-paper/90 backdrop-blur-md",
+          "sticky top-0 z-30 flex h-16 items-center justify-between gap-4 px-5 lg:px-8",
+          night ? "bg-ink/95 backdrop-blur-md" : "bg-paper/85 backdrop-blur-md",
         )}
       >
         <Link to="/" className="flex min-h-11 items-baseline gap-2">
+          <span className="size-2 translate-y-1 bg-terracotta" aria-hidden="true" />
           <span className="font-display text-2xl italic leading-none">Ngopi</span>
           <span className={cn("brand-city", night ? "text-paper/70" : "text-olive")}>Samarinda</span>
         </Link>
@@ -45,7 +46,7 @@ export function Shell() {
         <Link
           to="/usulkan"
           className={cn(
-            "inline-flex h-11 items-center rounded-full px-4 text-sm",
+            "inline-flex h-11 items-center px-3 text-sm",
             isOn(path, "/usulkan")
               ? night
                 ? "bg-paper/10 font-medium"
@@ -68,11 +69,11 @@ export function Shell() {
                   to={tab.to}
                   aria-current={on ? "page" : undefined}
                   className={cn(
-                    "inline-flex min-h-11 items-center gap-2 rounded-full px-3 text-sm transition-colors duration-150",
+                    "inline-flex min-h-11 items-center gap-2 px-3 text-sm transition-colors duration-150",
                     on
                       ? night
-                        ? "bg-paper/10 font-medium"
-                        : "bg-paper-2 font-medium"
+                        ? "font-medium text-paper"
+                        : "font-medium text-ink"
                       : night
                         ? "text-paper/70 hover:text-paper"
                         : "text-muted hover:text-ink",
@@ -107,8 +108,8 @@ export function Shell() {
       />
       <nav
         className={cn(
-          "fixed inset-x-0 bottom-0 z-40 flex border-t tabbar lg:hidden",
-          night ? "border-ink-soft bg-ink" : "border-line bg-paper",
+          "fixed inset-x-0 bottom-0 z-40 flex tabbar lg:hidden",
+          night ? "bg-ink" : "bg-paper",
         )}
         aria-label="Utama"
       >
@@ -121,7 +122,7 @@ export function Shell() {
               to={tab.to}
               aria-current={on ? "page" : undefined}
               className={cn(
-                "flex min-h-16 flex-1 flex-col items-center justify-center gap-0.5 text-xs tracking-wide transition-colors duration-150",
+                "flex min-h-16 flex-1 flex-col items-center justify-center gap-1 text-xs tracking-wide transition-transform duration-150 active:scale-95",
                 on ? "text-ink" : "text-muted",
                 night && (on ? "text-paper" : "text-paper/70"),
               )}

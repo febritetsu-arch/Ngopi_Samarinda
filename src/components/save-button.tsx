@@ -21,7 +21,7 @@ export function SaveButton({
       aria-label={saved ? `Hapus ${name} dari simpanan` : `Simpan ${name}`}
       onClick={() => toggle(slug)}
       className={cn(
-        "press grid size-11 place-items-center rounded-full bg-paper text-ink shadow-lift",
+        "press grid size-11 place-items-center bg-paper text-ink shadow-lift transition-transform duration-200 hover:scale-105",
         className,
       )}
     >

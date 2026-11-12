@@ -32,10 +32,10 @@ function Chip({
       aria-pressed={pressed}
       onClick={onClick}
       className={cn(
-        "press h-11 shrink-0 rounded-full border px-4 text-sm transition-colors duration-150",
+        "press relative h-11 shrink-0 px-1 text-sm transition-colors duration-150",
         pressed
-          ? "border-ink bg-ink text-paper"
-          : "border-line bg-paper text-ink hover:border-ink/40 hover:bg-paper-2",
+          ? "font-medium text-ink after:absolute after:inset-x-1 after:bottom-2 after:h-0.5 after:bg-terracotta"
+          : "text-muted hover:text-ink",
       )}
     >
       {children}
@@ -78,9 +78,9 @@ export function Filters({ search }: { search: DiscoverSearch }) {
   }, [open]);
 
   return (
-    <div className="mt-6">
-      <div className="sticky top-16 z-20 -mx-5 border-b border-line bg-paper/90 px-5 py-3 backdrop-blur-md lg:mx-0 lg:rounded-none lg:border-line lg:px-0">
-        <div className="flex items-center gap-2">
+    <div className="contents">
+      <div className="sticky top-16 z-20 -mx-5 mt-6 bg-paper/85 px-5 py-3 backdrop-blur-md lg:mx-0 lg:px-0">
+        <div className="flex items-center gap-3">
           <div className="scroll-row min-w-0 flex-1" aria-label="Suasana">
             <Chip pressed={!search.mood} onClick={() => apply({ mood: undefined })}>
               Semua
@@ -99,11 +99,11 @@ export function Filters({ search }: { search: DiscoverSearch }) {
             type="button"
             onClick={() => setOpen(true)}
             aria-expanded={open}
-            className="press inline-flex h-11 shrink-0 items-center gap-2 rounded-full bg-ink px-4 text-sm font-medium text-paper lg:hidden"
+            className="press inline-flex h-11 shrink-0 items-center gap-2 bg-paper-2 px-4 text-sm font-medium text-ink lg:hidden"
           >
             <SlidersHorizontal className="size-4" />
             Saring
-            {activeExtra > 0 ? <span className="tabular-nums text-paper/80">{activeExtra}</span> : null}
+            {activeExtra > 0 ? <span className="tabular-nums text-terracotta">{activeExtra}</span> : null}
           </button>
         </div>
       </div>
@@ -130,18 +130,18 @@ export function Filters({ search }: { search: DiscoverSearch }) {
         inert={!open}
         aria-labelledby="saringan-judul"
         className={cn(
-          "above-tab filter-sheet fixed inset-x-0 z-50 flex flex-col rounded-t-xl bg-paper shadow-lift transition-transform duration-200 ease-out lg:hidden",
+          "filter-sheet fixed inset-x-0 bottom-0 z-50 flex flex-col bg-paper pb-16 shadow-lift transition-transform duration-200 ease-out lg:hidden",
           open ? "translate-y-0" : "pointer-events-none translate-y-full",
         )}
       >
-        <div className="flex items-center justify-between border-b border-line px-5 py-3">
+        <div className="flex items-center justify-between px-5 py-4">
           <h2 id="saringan-judul" className="font-display text-2xl">
             Saringan
           </h2>
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="press grid size-11 place-items-center rounded-full bg-paper-2 text-ink"
+            className="press grid size-11 place-items-center bg-paper-2 text-ink"
             aria-label="Tutup"
           >
             <X className="size-5" />
@@ -150,11 +150,11 @@ export function Filters({ search }: { search: DiscoverSearch }) {
         <div className="overflow-y-auto px-5 py-4">
           <Secondary search={search} apply={apply} onReset={() => navigate({ to: "/jelajah", search: {} })} />
         </div>
-        <div className="border-t border-line px-5 py-3">
+        <div className="px-5 py-3">
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="press h-12 w-full rounded-full bg-terracotta text-sm font-medium text-paper"
+            className="press h-12 w-full bg-terracotta text-sm font-medium text-paper transition-colors duration-150 hover:bg-ink"
           >
             Lihat hasil
           </button>
@@ -217,7 +217,7 @@ function Secondary({
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
-        <div className="grid grid-cols-3 gap-1 rounded-full bg-paper-2 p-1" aria-label="Urutan">
+        <div className="flex flex-wrap gap-x-4" aria-label="Urutan">
           {sorts.map((item) => {
             const on = (search.sort ?? "kurasi") === item.id;
             return (
@@ -227,8 +227,10 @@ function Secondary({
                 aria-pressed={on}
                 onClick={() => apply({ sort: item.id === "kurasi" ? undefined : item.id })}
                 className={cn(
-                  "press h-10 rounded-full px-3 text-sm transition-colors duration-150",
-                  on ? "bg-ink font-medium text-paper" : "text-muted hover:text-ink",
+                  "press relative h-11 px-1 text-sm transition-colors duration-150",
+                  on
+                    ? "font-medium text-ink after:absolute after:inset-x-1 after:bottom-2 after:h-0.5 after:bg-terracotta"
+                    : "text-muted hover:text-ink",
                 )}
               >
                 {item.label}
