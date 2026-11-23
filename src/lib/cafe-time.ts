@@ -70,6 +70,13 @@ export function distanceKm(lat: number, lng: number, fromLat: number, fromLng: n
   return r * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+/** Stable sample score so cards can show a star like the reference frame. */
+export function cafeRating(slug: string) {
+  let n = 0;
+  for (let i = 0; i < slug.length; i++) n = (n + slug.charCodeAt(i) * (i + 3)) % 8;
+  return 4 + n / 10;
+}
+
 export function formatKm(km: number) {
   if (km < 1) return `${Math.round(km * 1000)} m`;
   return `${km.toFixed(1).replace(".", ",")} km`;
