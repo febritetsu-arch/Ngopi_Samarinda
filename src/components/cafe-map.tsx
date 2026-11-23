@@ -54,8 +54,8 @@ export function CafeMap({
       zoomControl
     >
       <TileLayer
-        attribution='&copy; OpenStreetMap &copy; CARTO'
-        url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+        attribution='&copy; OpenStreetMap'
+        url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <Camera cafes={cafes} selected={active} />
       {cafes.map((cafe) => (

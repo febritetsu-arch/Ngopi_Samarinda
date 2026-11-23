@@ -1,23 +1,26 @@
+import { useEffect, useState } from "react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import {
+  ArrowLeft,
   AirVent,
   Car,
+  ChevronDown,
   CigaretteOff,
-  Clock,
+  Coffee,
   Leaf,
   MapPin,
   Moon,
-  Share2,
   Music,
   PawPrint,
   Plug,
+  Share2,
+  Star,
   Trees,
   Users,
+  Utensils,
   Wifi,
   type LucideIcon,
 } from "lucide-react";
-import { FooterNote } from "@/components/footer-note";
-import { SaveButton } from "@/components/save-button";
 import { MapView } from "@/components/map-view";
 import {
   CITY_CENTER,
@@ -29,7 +32,8 @@ import {
   type Cafe,
   type FacilityId,
 } from "@/data/cafes";
-import { distanceKm, formatHours, formatKm, formatRp, statusAt, useNow } from "@/lib/cafe-time";
+import { cafePhoto } from "@/lib/cafe-photo";
+import { cafeRating, distanceKm, formatHours, formatKm, formatRp, statusAt, useNow } from "@/lib/cafe-time";
 import { cn } from "@/lib/cn";
 import {
   crowdLevelLabel,
@@ -134,9 +138,16 @@ async function copyCafeLink() {
   toast(copied ? "Tautan disalin." : "Tidak bisa menyalin tautan.");
 }
 
+const weekdays = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"];
+
 function CafeBody({ cafe, catalog }: { cafe: Cafe; catalog: Cafe[] }) {
   const now = useNow();
   const state = now ? statusAt(cafe, now) : null;
+  const [more, setMore] = useState(false);
+  const [been, setBeen] = useState(false);
+  useEffect(() => {
+    setBeen(localStorage.getItem(`ngopi-been:${cafe.slug}`) === "1");
+  }, [cafe.slug]);
   const km = distanceKm(cafe.lat, cafe.lng, CITY_CENTER.lat, CITY_CENTER.lng);
   const related = catalog
     .filter((item) => item.slug !== cafe.slug && item.moods.some((mood) => cafe.moods.includes(mood)))
@@ -164,230 +175,180 @@ function CafeBody({ cafe, catalog }: { cafe: Cafe; catalog: Cafe[] }) {
     });
   }
 
-  return (
-    <article className="pb-28">
-      <div className="lg:mx-auto lg:grid lg:max-w-6xl lg:grid-cols-12 lg:px-8 lg:pt-8">
-        <div className="relative lg:col-span-7 lg:col-start-6 lg:row-start-1">
-          <img
-            src={cafe.image}
-            alt={cafe.imageAlt}
-            width={1200}
-            height={1600}
-            fetchPriority="high"
-            className="aspect-[4/5] w-full object-cover sm:aspect-[5/4]"
-          />
-          <div className="absolute top-4 right-4 left-4 flex items-center justify-between">
-            <Link
-              to="/jelajah"
-              className="press inline-flex h-11 items-center bg-paper px-4 text-sm text-ink shadow-lift transition-colors duration-150 hover:bg-paper-2"
-            >
-              Jelajah
-            </Link>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => void copyCafeLink()}
-                aria-label="Salin tautan kafe"
-                className="press inline-flex size-11 items-center justify-center bg-paper text-ink shadow-lift transition-colors duration-150 hover:bg-paper-2"
-              >
-                <Share2 className="size-4" />
-              </button>
-              <SaveButton slug={cafe.slug} name={cafe.name} />
-            </div>
-          </div>
-        </div>
+  const mood = cafe.moods[0];
+  const rating = cafeRating(cafe.slug).toFixed(1);
+  const facts = [
+    { icon: Coffee, label: "Jenis", value: mood ? moods[mood].label : "Kafe" },
+    { icon: Users, label: "Suasana", value: cafe.moods.map((id) => moods[id].label).slice(0, 2).join(", ") },
+    { icon: Utensils, label: "Makanan", value: cafe.menu.length > 2 ? "Ada" : "Minuman" },
+    { icon: Plug, label: "Colokan", value: cafe.facilities.includes("colokan") ? "Ada" : "Tidak" },
+  ];
 
-        <div className="relative z-10 bg-paper px-5 pt-8 lg:col-span-6 lg:col-start-1 lg:row-start-1 lg:flex lg:flex-col lg:justify-end lg:bg-transparent lg:px-0 lg:pt-0 lg:pr-10 lg:pb-6">
-          <p className="kicker">
-            Data contoh · {cafe.district}
-          </p>
-          <h1 className="mt-3 max-w-xl text-display">{cafe.name}</h1>
-          <p className="mt-5 max-w-md text-lg leading-relaxed text-ink-soft">{cafe.blurb}</p>
-          <dl className="mt-6 max-w-sm space-y-2 text-sm">
-            <div className="flex items-baseline justify-between gap-4">
-              <dt className="text-muted">Status</dt>
-              <dd className={cn("font-medium", state?.open ? "text-olive" : "text-ink")}>
-                {state ? (state.open ? "Buka" : "Tutup") : "Jam contoh"}
-              </dd>
-            </div>
-            <div className="flex items-baseline justify-between gap-4">
-              <dt className="text-muted">Harga</dt>
-              <dd>
-                {prices[cafe.price].label} · {prices[cafe.price].range}
-              </dd>
-            </div>
-            <div className="flex items-baseline justify-between gap-4">
-              <dt className="text-muted">Jarak</dt>
-              <dd>
-                {formatKm(km)} dari {CITY_CENTER.label}
-              </dd>
-            </div>
-            <div className="flex items-baseline justify-between gap-4">
-              <dt className="text-muted">Kawasan</dt>
-              <dd>{cafe.neighborhood}</dd>
-            </div>
-          </dl>
+  function markBeen() {
+    const next = !been;
+    setBeen(next);
+    localStorage.setItem(`ngopi-been:${cafe.slug}`, next ? "1" : "0");
+  }
+
+  return (
+    <article className="mx-auto w-full max-w-lg pb-8">
+      <div className="relative">
+        <img
+          src={cafePhoto(cafe.image, cafe.slug)}
+          alt={cafe.imageAlt}
+          width={1200}
+          height={800}
+          fetchPriority="high"
+          className="aspect-video w-full object-cover"
+        />
+        <div className="absolute top-4 right-4 left-4 flex items-center justify-between">
+          <Link
+            to="/"
+            aria-label="Kembali"
+            className="grid size-10 place-items-center rounded-full bg-paper text-ink shadow-lift"
+          >
+            <ArrowLeft className="size-5" />
+          </Link>
+          <button
+            type="button"
+            aria-pressed={been}
+            onClick={markBeen}
+            className="inline-flex h-10 items-center gap-2 rounded-full bg-paper px-3 text-sm shadow-lift"
+          >
+            <span className={cn("size-4 rounded-full border", been ? "border-open bg-open" : "border-ink")} />
+            Sudah mampir?
+          </button>
         </div>
       </div>
 
-      <CrowdReport fresh={fresh} own={own} nowMs={nowMs} onSubmit={submitCrowd} />
+      <div className="px-4 pt-5">
+        <div className="flex items-start justify-between gap-3">
+          <h1 className="font-display text-3xl leading-none">{cafe.name}</h1>
+          <p className="inline-flex items-center gap-1 text-base font-medium">
+            <Star className="size-4 fill-star text-star" aria-hidden="true" />
+            <span className="tabular-nums">{rating}</span>
+          </p>
+        </div>
+        <p className="mt-2 text-sm">
+          <span className={state?.open ? "font-medium text-open" : "font-medium text-closed"}>
+            {state ? (state.open ? "Buka" : "Tutup") : "Jam"}
+          </span>
+          <span className="text-muted"> · tutup {formatHours(cafe).split("–")[1]}</span>
+        </p>
 
-      <div className="mx-auto mt-16 grid max-w-6xl gap-16 px-5 lg:grid-cols-12 lg:px-8">
-        <div className="lg:col-span-7">
-          <div>
-            {cafe.story.map((paragraph, index) => (
-              <p
-                key={paragraph}
-                className={cn(
-                  "max-w-xl",
-                  index === 0 ? "font-display text-2xl leading-snug text-ink sm:text-3xl" : "mt-5 text-ink-soft",
-                )}
-              >
+        <h2 className="mt-6 text-lg font-semibold">Detail kafe</h2>
+        <ul className="mt-3 grid grid-cols-2 gap-3">
+          {facts.map((fact) => (
+            <li key={fact.label} className="flex items-center gap-3">
+              <span className="grid size-12 place-items-center rounded-xl border border-line">
+                <fact.icon className="size-5" aria-hidden="true" />
+              </span>
+              <span>
+                <span className="block text-sm text-muted">{fact.label}</span>
+                <span className="block text-sm font-medium">{fact.value}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+        <button
+          type="button"
+          aria-expanded={more}
+          onClick={() => setMore((value) => !value)}
+          className="mx-auto mt-4 flex h-11 items-center gap-1 text-sm text-muted"
+        >
+          {more ? "Sembunyikan" : "Lihat lebih"}
+          <ChevronDown className={cn("size-4", more && "rotate-180")} />
+        </button>
+
+        {more ? (
+          <div className="mt-2 space-y-6">
+            {cafe.story.map((paragraph) => (
+              <p key={paragraph} className="text-sm leading-relaxed text-ink-soft">
                 {paragraph}
               </p>
             ))}
-          </div>
-
-          <h2 className="mt-20 text-title">Menu contoh</h2>
-          <ul className="mt-8 max-w-xl space-y-7">
-            {cafe.menu.map((item, index) => (
-              <li
-                key={item.name}
-                className={cn("flex items-baseline justify-between gap-6", index % 2 === 1 && "sm:pl-10")}
-              >
-                <span>
-                  <span className="block font-display text-2xl leading-none">{item.name}</span>
-                  <span className="mt-1 block text-sm text-muted">{item.note}</span>
-                </span>
-                <span className="shrink-0 font-display text-xl text-terracotta tabular-nums">
-                  {formatRp(item.price)}
-                </span>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-8 max-w-sm text-sm text-muted">Andalan rumah: {cafe.signature}.</p>
-        </div>
-
-        <aside className="space-y-12 lg:col-span-4 lg:col-start-9 lg:sticky lg:top-24 lg:self-start">
-          <section className="bg-paper-2 px-5 py-6">
-            <p className="kicker">Sekarang</p>
-            <p className="mt-3 font-display text-5xl leading-none">{state ? (state.open ? "Buka" : "Tutup") : "—"}</p>
-            <p className="mt-3 flex items-center gap-2 text-sm text-ink-soft">
-              <Clock className="size-4 text-olive" />
-              <span className="tabular-nums">
-                {formatHours(cafe)} WITA
-                {state ? ` · ${state.clock}` : ""}
-              </span>
-            </p>
-            <CrowdBars cafe={cafe} hour={state?.hour} />
-            <p className="mt-3 text-xs text-muted">Pola di bawah adalah contoh, bukan data real-time.</p>
-          </section>
-
-          <section>
-            <h2 className="font-display text-3xl">Fasilitas</h2>
-            <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-3">
+            <ul className="space-y-3">
+              {cafe.menu.map((item) => (
+                <li key={item.name} className="flex items-baseline justify-between gap-4 text-sm">
+                  <span>
+                    <span className="block font-medium">{item.name}</span>
+                    <span className="text-muted">{item.note}</span>
+                  </span>
+                  <span className="shrink-0 tabular-nums">{formatRp(item.price)}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="text-sm text-muted">Andalan: {cafe.signature}.</p>
+            <ul className="flex flex-wrap gap-2">
               {cafe.facilities.map((id) => {
                 const Icon = facilityIcons[id];
                 return (
-                  <li key={id} className="inline-flex items-center gap-2 text-sm">
-                    <Icon className="size-4 text-olive" />
+                  <li key={id} className="inline-flex h-9 items-center gap-2 rounded-full border border-line px-3 text-sm">
+                    <Icon className="size-4" />
                     {facilities[id].label}
                   </li>
                 );
               })}
             </ul>
-          </section>
+            <CrowdBars cafe={cafe} hour={state?.hour} />
+            <CrowdReport fresh={fresh} own={own} nowMs={nowMs} onSubmit={submitCrowd} />
+          </div>
+        ) : null}
 
-          <section>
-            <h2 className="font-display text-3xl">Suasana</h2>
-            <ul className="mt-4 flex flex-wrap gap-x-4">
-              {cafe.moods.map((id) => (
-                <li key={id}>
-                  <Link
-                    to="/jelajah"
-                    search={{ mood: id }}
-                    className="rule-draw press inline-flex h-11 items-center text-sm font-medium"
-                  >
-                    {moods[id].label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </section>
+        <h2 className="mt-6 text-lg font-semibold">Alamat</h2>
+        <p className="mt-2 text-sm text-ink-soft">
+          {cafe.address}
+          <span className="text-muted">
+            {" "}
+            · {formatKm(km)} dari {CITY_CENTER.label}
+          </span>
+        </p>
+        <div className="mt-3 h-40 overflow-hidden rounded-xl">
+          <MapView cafes={[cafe]} selected={cafe.slug} onSelect={() => undefined} />
+        </div>
 
-          <section>
-            <h2 className="flex items-center gap-2 font-display text-3xl">
-              <MapPin className="size-5" />
-              Lokasi contoh
-            </h2>
-            <p className="mt-3 text-sm text-ink-soft">{cafe.address}</p>
-            <div className="mt-4 h-56 overflow-hidden">
-              <MapView cafes={[cafe]} selected={cafe.slug} onSelect={() => undefined} />
-            </div>
-            <a
-              href={mapHref}
-              target="_blank"
-              rel="noreferrer"
-              className="rule-draw mt-3 inline-flex min-h-11 items-center text-sm font-medium"
-            >
-              Buka di OpenStreetMap
-            </a>
-          </section>
-        </aside>
-      </div>
+        <h2 className="mt-6 text-lg font-semibold">Jam operasional</h2>
+        <ul className="mt-2 space-y-2 text-sm">
+          {weekdays.map((day) => (
+            <li key={day} className="flex justify-between gap-4">
+              <span>{day}</span>
+              <span className="tabular-nums text-ink-soft">{formatHours(cafe)}</span>
+            </li>
+          ))}
+        </ul>
 
-      {related.length > 0 ? (
-        <section className="mx-auto mt-24 max-w-6xl px-5 lg:px-8">
-          <h2 className="text-title">Suasana yang berdekatan</h2>
-          <ul className="mt-8 flex gap-5 overflow-x-auto pb-2 lg:grid lg:grid-cols-12 lg:overflow-visible">
-            {related.map((item, index) => (
-              <li
-                key={item.slug}
-                className={cn(
-                  "w-64 shrink-0 lg:w-auto",
-                  index === 0 && "lg:col-span-5",
-                  index === 1 && "lg:col-span-4 lg:mt-12",
-                  index === 2 && "lg:col-span-3",
-                )}
-              >
-                <Link to="/kafe/$slug" params={{ slug: item.slug }} className="group block">
-                  <img
-                    src={item.image}
-                    alt=""
-                    width={640}
-                    height={800}
-                    className={cn(
-                      "photo-zoom w-full object-cover",
-                      index === 1 ? "aspect-square" : "aspect-[4/5]",
-                    )}
-                  />
-                  <span className="name-nudge mt-3 block font-display text-2xl leading-none">{item.name}</span>
-                  <span className="mt-1 block text-sm text-muted">
-                    {item.district} · {prices[item.price].label}
-                  </span>
+        <div className="mt-6 grid grid-cols-2 gap-3">
+          <a
+            href={mapHref}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-ink text-sm font-medium text-paper"
+          >
+            <MapPin className="size-4" />
+            Rute
+          </a>
+          <button
+            type="button"
+            onClick={() => void copyCafeLink()}
+            className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-ink text-sm font-medium text-paper"
+          >
+            <Share2 className="size-4" />
+            Bagikan
+          </button>
+        </div>
+
+        {related.length > 0 ? (
+          <ul className="mt-8 space-y-3">
+            {related.map((item) => (
+              <li key={item.slug}>
+                <Link to="/kafe/$slug" params={{ slug: item.slug }} className="text-sm font-medium underline">
+                  {item.name}
                 </Link>
+                <span className="text-sm text-muted"> · {prices[item.price].label}</span>
               </li>
             ))}
           </ul>
-        </section>
-      ) : null}
-      <FooterNote />
-      <div className="dock fixed z-30 inset-x-3 lg:inset-x-auto lg:left-8 lg:w-96">
-        <div className="flex items-center gap-3 bg-ink px-4 py-3 text-paper shadow-lift">
-          <div className="min-w-0 flex-1">
-            <p className="truncate font-display text-xl leading-none">{cafe.name}</p>
-            <p className="mt-1 truncate text-xs text-paper/70">
-              {state ? (state.open ? "Buka" : "Tutup") : "Jam contoh"} · {formatHours(cafe)}
-              {fresh ? ` · ${crowdLevelLabel[fresh.level]}` : ""}
-            </p>
-          </div>
-          <a
-            href="#keramaian"
-            className="press inline-flex h-11 shrink-0 items-center bg-terracotta px-4 text-sm font-medium text-paper transition-colors duration-150 hover:bg-paper hover:text-ink"
-          >
-            Lapor
-          </a>
-        </div>
+        ) : null}
       </div>
     </article>
   );
